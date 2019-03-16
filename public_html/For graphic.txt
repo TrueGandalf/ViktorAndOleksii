@@ -1,0 +1,12 @@
+-- 1 Add possibility to draw few graphics
++ 2 Add /// to change min Y
+-- 3 Make colours and thicknesses changeable
++ 4 Select a rectangle (we can do it by x, y, max, min) but by mouse on the canvas
+-- 5 See numberes next to cursor while he is over canvas
+-- 6 Add undo and redo buttons for scale chages (work with array = stack)
+-- 7 Bad    way:   dont draw lines and numbers at the edge of the graphic
+-- 7 Good way:           draw numbers out of the graphic
+-- 8 Add descriptions to the graphic
+
+DO ALPHA VERSION!!!!!!!!!!!
+FULL but with little possibilities!
