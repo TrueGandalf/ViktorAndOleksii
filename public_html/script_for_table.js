@@ -117,6 +117,7 @@ function buildGraphic() {
 		showGraphic(undefined, undefined, undefined, undefined, currentArrayY);
 
 }
+
 function Graphic(){
     
 }
@@ -226,6 +227,7 @@ function showGraphic(max, min, leftX, rightX, currentArrayY) {
 	//currentColor = "#0ff";
 	//currentArrayY = currentArrayY.map(x=>x/2);
 	//drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY, currentArrayY, currentColor);
+
 	
 }
 function drawLines(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY) {
@@ -835,41 +837,7 @@ function precision(num) {
 	return result;
 }
 function redraw() {document.getElementById("glassForGraphic").width = document.getElementById("glassForGraphic").width;}
-var dataFormat = '0';
-function setDataFormat(id) {
-	//alert(document.getElementById(id).style.cssText.length);
-	document.getElementById('setDataFormat11').style.cssText = '';
-	document.getElementById('setDataFormat11+').style.cssText = '';
-	document.getElementById('setDataFormat12').style.cssText = '';
-	document.getElementById('setDataFormat21').style.cssText = '';
-	document.getElementById('setDataFormat31').style.cssText = '';
-	document.getElementById('setDataFormat41').style.cssText = '';
-	document.getElementById(id).style.cssText = 'border: 10px solid green; background: green;';
 
-	switch (id) {
-		case "setDataFormat11":
-			dataFormat = "11";
-			break;
-		case "setDataFormat11+":
-			dataFormat = "11";
-			break;
-		case "setDataFormat12":
-			dataFormat = "12";
-			break;
-		case "setDataFormat21":
-			dataFormat = "21";
-			break;
-		case "setDataFormat31":
-			dataFormat = "31";
-			break;
-		case "setDataFormat41":
-			dataFormat = "41";
-			break;
-		default:
-			dataFormat = '0';
-			break;
-	}
-}
 
 function download() {
 	var canvas = document.getElementById("graphic");
@@ -893,7 +861,7 @@ window.onload = function() {
 	//canvasLive.onmouseout = stopDrawing;
 	canvasLive.onmousemove = draw;
 	//***********************************************************
-	setDataFormat('setDataFormat11+');
+
 
     $('#customDataFormat').hide('slow');
     hideAllShowOne("");//#interpolationDiv
@@ -999,4 +967,5 @@ function copyCommaText(id) {
 function putCommaText(id) {
     document.getElementById(id).value = commaText;
     alert("Исходный текст с запятыми восстановлен.");
-}putCommaText
+
+}
