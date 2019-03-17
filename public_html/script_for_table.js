@@ -95,46 +95,27 @@ var arrayY = [];
 var ordinatArrays = [];
 var currentLeftX, currentRightX, currentMax, currentMin;
 function buildGraphic() {
-	var graphicString = document.getElementById("textareaGraphicString").value;
-	var graphicTypeString = graphicString.substring(0,5);
-	var GrraphicTypeIndicator_1_1 = '"""St';
-	var GrraphicTypeIndicator_1_2 = '"Stor';
-	var GrraphicTypeIndicator_2_1 = 'Date:';
+	graphNum = 4;
 	arrayX.length = 0;
 	arrayY.length = 0;
 
-	var startIndex = 0;
-	var columnSwitch = false;
 
-	var endIndex = graphicString.indexOf("	", startIndex);
-	var i = -1;
-	while ( (graphicString.length >= endIndex) && ~endIndex && ~startIndex) {//Stops on ~endIndex	//from 41
-	//while (~graphicString.indexOf("\n", endIndex) && ~endIndex && ~startIndex) {//Stops on ~endIndex
-		columnSwitch = !columnSwitch;
-		if (columnSwitch) {
-			i++;
-			arrayX[i] = +graphicString.substring(startIndex, endIndex);
-			while (graphicString.substring(endIndex, endIndex+1) =="	" || graphicString.substring(endIndex, endIndex+1) == "." ) {
-				endIndex++;
-	let  currentArrayY = [];
-	ordinatArrays.push(currentArrayY);
-			}
-			startIndex = endIndex;//for y
-			endIndex = graphicString.indexOf("\n", startIndex);// for y
-			if (!(~endIndex)) endIndex = graphicString.length;//from 41
-		}
-		if (!columnSwitch) {
-			arrayY[i] = +graphicString.substring(startIndex, endIndex);
-			startIndex = ++endIndex;//for x
-			endIndex = graphicString.indexOf("	", startIndex);//for x
-		}
-	}
+	
+	
+	//debugger;
+	//if (!arrayX.length || !currentArrayY.length) {
+	//	alert("Array doesnt constructed!");
+	//	return;
+	//}
 
-	if (!arrayX.length || !arrayY.length) {
-		alert("Array doesnt constructed!");
-		return;
-	}
-	showGraphic(undefined, undefined, undefined, undefined);
+	
+	//ordinatArrays = [];
+	ordinatArrays = data[graphNum].columns.slice(1).map(x=>x.slice(1));
+	let currentArrayY = ordinatArrays[0];
+
+		arrayX = data[graphNum].columns[0].slice(1);
+		showGraphic(undefined, undefined, undefined, undefined, currentArrayY);
+
 }
 
 function Graphic(){
@@ -225,6 +206,7 @@ function showGraphic(max, min, leftX, rightX, currentArrayY) {
 	var horizontalDiapason = arrayX[arrayX.length-1] - window.arrayX[0];
 
 	var verticalDiapason = topY - bottomY;
+
 	if ( !(leftX-rightX)  || !(topY-bottomY) ) {
 		alert("You are suspicious, what do you want one more time? \n X_min = X_max ? \n Y_min=Y_max ? \n O_o");// \n x<sub>min</sub>=x<sub>max</sub>? \n y<sub>min</sub>=y<sub>max</sub> \n
 		return;
@@ -235,11 +217,17 @@ function showGraphic(max, min, leftX, rightX, currentArrayY) {
 	currentMin = bottomY;
 
 	drawLines(graphic_context, graphic_height, graphic_width, leftX, (rightX - leftX), rightX, verticalDiapason, bottomY);
-	currentColor = "#00f";
-	drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY, currentArrayY, currentColor);
-	currentColor = "#0ff";
-	currentArrayY = currentArrayY.map(x=>x/2);
-	drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY, currentArrayY, currentColor);
+	//arrayX = data[0].columns[0].slice(1).join("\n");
+	//ordinatArrays = [];
+	//ordinatArrays = data[0].columns.slice(1).map(x=>x.slice(1));
+	for (let i = 0; i < ordinatArrays.length; i++) {
+		currentColor = data[graphNum].colors[`y${i}`];
+		drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY, ordinatArrays[i], currentColor);
+	}
+	//currentColor = "#0ff";
+	//currentArrayY = currentArrayY.map(x=>x/2);
+	//drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY, currentArrayY, currentColor);
+
 	
 }
 function drawLines(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY) {
@@ -850,6 +838,7 @@ function precision(num) {
 }
 function redraw() {document.getElementById("glassForGraphic").width = document.getElementById("glassForGraphic").width;}
 
+
 function download() {
 	var canvas = document.getElementById("graphic");
 	window.open(canvas.toDataURL("image/png"), "mywindow");
@@ -872,7 +861,7 @@ window.onload = function() {
 	//canvasLive.onmouseout = stopDrawing;
 	canvasLive.onmousemove = draw;
 	//***********************************************************
-	
+
 
     $('#customDataFormat').hide('slow');
     hideAllShowOne("");//#interpolationDiv
@@ -978,4 +967,5 @@ function copyCommaText(id) {
 function putCommaText(id) {
     document.getElementById(id).value = commaText;
     alert("Исходный текст с запятыми восстановлен.");
+
 }
