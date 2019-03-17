@@ -92,6 +92,7 @@ function universalParsing() {
 
 var arrayX = [];
 var arrayY = [];
+var ordinatArrays = [];
 var currentLeftX, currentRightX, currentMax, currentMin;
 function buildGraphic() {
 	var graphicString = document.getElementById("textareaGraphicString").value;
@@ -108,17 +109,19 @@ function buildGraphic() {
 	var endIndex = graphicString.indexOf("	", startIndex);
 	var i = -1;
 	while ( (graphicString.length >= endIndex) && ~endIndex && ~startIndex) {//Stops on ~endIndex	//from 41
+	//while (~graphicString.indexOf("\n", endIndex) && ~endIndex && ~startIndex) {//Stops on ~endIndex
 		columnSwitch = !columnSwitch;
 		if (columnSwitch) {
 			i++;
 			arrayX[i] = +graphicString.substring(startIndex, endIndex);
 			while (graphicString.substring(endIndex, endIndex+1) =="	" || graphicString.substring(endIndex, endIndex+1) == "." ) {
 				endIndex++;
+	let  currentArrayY = [];
+	ordinatArrays.push(currentArrayY);
 			}
 			startIndex = endIndex;//for y
 			endIndex = graphicString.indexOf("\n", startIndex);// for y
 			if (!(~endIndex)) endIndex = graphicString.length;//from 41
-
 		}
 		if (!columnSwitch) {
 			arrayY[i] = +graphicString.substring(startIndex, endIndex);
@@ -126,16 +129,68 @@ function buildGraphic() {
 			endIndex = graphicString.indexOf("	", startIndex);//for x
 		}
 	}
-	
-	
+
 	if (!arrayX.length || !arrayY.length) {
 		alert("Array doesnt constructed!");
 		return;
 	}
-	
 	showGraphic(undefined, undefined, undefined, undefined);
 }
-function showGraphic(max, min, leftX, rightX ) {
+
+function Graphic(){
+    
+}
+var graphicNumber = 0;
+var graphics = [];
+function newGraphic() {
+    graphics[graphicNumber] = new Graphic();
+}
+function buildCustomGraphic(whetherXToMarker, contentXTo, whetherYAfterMarker, contentYAfter,
+                            whetherYToMarker, contentYTo, whetherXAfterMarker, contentXAfter) {
+    var currentSymbol = 0;
+    var start = currentSymbol;//first symbol
+    var end = 0;
+    var textResult = "";
+    var garbageStart = 0;
+
+    while (currentSymbol < document.getElementById("textareaGraphicString").value.length) {
+
+        if (whetherXToMarker) {
+            end = takeToMarker(start, contentXTo);//last symbol
+        } else {
+            end = takeToQuantity(start, contentXTo);//last symbol
+        }
+        textResult += printIt(start, end, "green");//first symbol, last symbol
+        start = end + 1;
+        garbageStart = start;
+
+        if (whetherYAfterMarker) {
+            start = takeAfterMarker(start, contentYAfter);
+        } else {
+            start = takeAfterQuantity(start, contentYAfter);
+        }
+        textResult += printIt(garbageStart, start, "grey");
+
+        if (whetherYToMarker) {
+            end = takeToMarker(start, contentYTo);
+        } else {
+            end = takeToQuantity(start, contentYTo);
+        }
+        textResult += printIt(start, end, "blue");
+        start = end+1;
+        garbageStart = start;
+
+        if (whetherXAfterMarker) {
+            start = takeAfterMarker(start, contentXAfter);
+        } else {
+            start = takeAfterQuantity(start, contentXAfter);
+        }
+        textResult += printIt(start, end, "grey");//first symbol, last symbol
+
+    }
+
+}
+function showGraphic(max, min, leftX, rightX, currentArrayY) {
 	document.getElementById("graphic").width = document.getElementById("graphic").width;// redraw canvas
 
 
@@ -161,7 +216,7 @@ function showGraphic(max, min, leftX, rightX ) {
 	}
 
 	if (!max) {
-		var topY = Math.max.apply(Math, arrayY);
+		var topY = Math.max.apply(Math, currentArrayY);
 		topY = (topY - bottomY)*1.04 + bottomY;
 	} else {
 		var topY = max;
@@ -170,7 +225,6 @@ function showGraphic(max, min, leftX, rightX ) {
 	var horizontalDiapason = arrayX[arrayX.length-1] - window.arrayX[0];
 
 	var verticalDiapason = topY - bottomY;
-
 	if ( !(leftX-rightX)  || !(topY-bottomY) ) {
 		alert("You are suspicious, what do you want one more time? \n X_min = X_max ? \n Y_min=Y_max ? \n O_o");// \n x<sub>min</sub>=x<sub>max</sub>? \n y<sub>min</sub>=y<sub>max</sub> \n
 		return;
@@ -181,7 +235,11 @@ function showGraphic(max, min, leftX, rightX ) {
 	currentMin = bottomY;
 
 	drawLines(graphic_context, graphic_height, graphic_width, leftX, (rightX - leftX), rightX, verticalDiapason, bottomY);
-	drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY);
+	currentColor = "#00f";
+	drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY, currentArrayY, currentColor);
+	currentColor = "#0ff";
+	currentArrayY = currentArrayY.map(x=>x/2);
+	drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY, currentArrayY, currentColor);
 	
 }
 function drawLines(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY) {
@@ -254,7 +312,8 @@ function drawLines(graphic_context, graphic_height, graphic_width, leftX, horizo
 	for (var x = 0; x <= xMax+1; x++) {//vertical lines
 		xSpecialRound = ( x * xBlackStep - oddXPiece );//strange but more precision = better result
 		//graphic_context.fillText( (+xSpecialRound + leftX).toFixed( precision(xBlackStep) ), ( x * xBlackStep - oddXPiece ) / horizontalDiapason *graphic_width +textIndent, graphic_height -textIndent );
-		graphic_context.fillText( "blabla", ( x * xBlackStep - oddXPiece ) / horizontalDiapason *graphic_width +textIndent, graphic_height -textIndent );
+		//debugger;
+		graphic_context.fillText( new Date(+(+xSpecialRound + leftX).toFixed( 0 )).toLocaleString("en-US", {month: "short", day: "numeric"}), ( x * xBlackStep - oddXPiece ) / horizontalDiapason *graphic_width +textIndent, graphic_height -textIndent );
 
 		graphic_context.moveTo( ( x * xBlackStep - oddXPiece ) / horizontalDiapason *graphic_width, 0);
 		graphic_context.lineTo( ( x * xBlackStep - oddXPiece ) / horizontalDiapason *graphic_width, graphic_height );
@@ -271,6 +330,7 @@ function drawLines(graphic_context, graphic_height, graphic_width, leftX, horizo
 	for (var y = 1; y <= yMax+1; y++) {//horizontal lines
 		specialRound = (y * yBlackStep - oddYPiece);//strange but more precision = better result
 		graphic_context.fillText((specialRound*1 + bottomY).toFixed( precision(yBlackStep) ), 0 +textIndent, (graphic_height - (y * yBlackStep - oddYPiece) / verticalDiapason *graphic_height) -textIndent );
+		//graphic_context.fillText("b", 0 +textIndent, (graphic_height - (y * yBlackStep - oddYPiece) / verticalDiapason *graphic_height) -textIndent );
 		graphic_context.moveTo(0, (graphic_height - (y * yBlackStep - oddYPiece) / verticalDiapason *graphic_height) );
 		graphic_context.lineTo(graphic_width, (graphic_height - (y * yBlackStep - oddYPiece)/ verticalDiapason *graphic_height) );
 	}
@@ -281,7 +341,8 @@ function drawLines(graphic_context, graphic_height, graphic_width, leftX, horizo
 	//=====================================================================================================================
 
 }
-function drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY) {
+function drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason,
+ rightX, verticalDiapason, bottomY, currentArrayY, currentColor) {
 
 	//graphic_context.moveTo( (arrayX[0]-leftX)/(rightX-leftX)*graphic_width , graphic_height);
 
@@ -289,14 +350,14 @@ function drawGraphic(graphic_context, graphic_height, graphic_width, leftX, hori
 	var newElement = 0;
 	for (var x = 1; x < graphic_width; x++ ) {
 		//graphic_context.lineTo( ( ( x*horizontalDiapason/(rightX-leftX) )+( (arrayX[0]-leftX)/(rightX-leftX)*graphic_width ) ) , graphic_height-( ( ( arrayY[ Math.floor(  x/graphic_width*(arrayY.length -1)) ] - bottomY) / (  verticalDiapason ) *graphic_height)+1) );
-		newElement = Math.floor(  x/(graphic_width-1)*(arrayY.length -1));
+		newElement = Math.floor(  x/(graphic_width-1)*(currentArrayY.length -1));
 		if (newElement !== element) {
-			graphic_context.lineTo(( ( x * horizontalDiapason / (rightX - leftX) ) + ( (arrayX[0] - leftX) / (rightX - leftX) * graphic_width ) ), graphic_height - ( ( ( arrayY[Math.floor(x / (graphic_width - 1) * (arrayY.length - 1))] - bottomY) / (  verticalDiapason ) * graphic_height) + 1));
+			graphic_context.lineTo(( ( x * horizontalDiapason / (rightX - leftX) ) + ( (arrayX[0] - leftX) / (rightX - leftX) * graphic_width ) ), graphic_height - ( ( ( currentArrayY[Math.floor(x / (graphic_width - 1) * (currentArrayY.length - 1))] - bottomY) / (  verticalDiapason ) * graphic_height) + 1));
 			element = newElement;
 		}
 	}
 
-	graphic_context.strokeStyle = "#00f";
+	graphic_context.strokeStyle = currentColor;
 	graphic_context.lineWidth = 2;
 	graphic_context.stroke();
 	graphic_context.beginPath();
@@ -810,6 +871,11 @@ window.onload = function() {
 	window.onmouseup = stopDrawing;
 	//canvasLive.onmouseout = stopDrawing;
 	canvasLive.onmousemove = draw;
+	//***********************************************************
+	
+
+    $('#customDataFormat').hide('slow');
+    hideAllShowOne("");//#interpolationDiv
 };
 
 var isDrawing = false;
@@ -866,4 +932,50 @@ function stopDrawing(e) {
 function hideShowDiv(divId){
 
     $(divId).toggle('slow');
+}
+function hideAllShowOne(divId){
+    $('#interpolationDiv').hide('slow');
+    $("#theLittlestDiv").hide('slow');
+    $("#theBiggestDiv").hide('slow');
+    $("#yPriXDiv").hide('slow');
+    $("#xPriYDiv").hide('slow');
+    $("#krutiznaDiv").hide('slow');
+    $("#averageDiv").hide('slow');
+
+    $(divId).show('slow');
+}
+function chooseYourWay() {
+    if (document.getElementById('customDataFormat').style.display == "none") {
+        buildGraphic();
+        console.log("'customDataFormat').hidden");
+    } else {
+        console.log("'customDataFormat').style.display - not hidden");
+        console.log("there is no function for it yet, but I started to do it");
+        buildCustomGraphic();
+        console.log("______________________________");
+    }
+    //vremenno tut budet zabros v parsing results
+    document.getElementById("parsingResults").innerHTML = "<span class='znachenie' > А вот и текст! </span>";
+    //$('div.demo-container').text('<p> А вот и текст! </p>');
+    //$('#parsingResults').text(<span> А вот и текст! </span>);
+}
+var commaText;
+function copyCommaText(id) {
+    //debugger;
+    //document.getElementById(id).textContent;
+    //if ((document.getElementsByName('numericSeparator')[0].checked)) {
+    commaText = document.getElementById(id).value;
+    console.log(document.getElementById(id).value);
+    console.log("proverka");
+    console.log("________");
+    document.getElementById(id).value = document.getElementById(id).value.replace(new RegExp(",",'g'),".");//opposite!
+
+    //} else{
+        //console.log("ne pashet");
+    //}
+    alert("Все запятые в тексте превратилисься в точки! Исходный текст сохранен. При изменении режима на 'точка' он бует восстановлен.");
+}
+function putCommaText(id) {
+    document.getElementById(id).value = commaText;
+    alert("Исходный текст с запятыми восстановлен.");
 }

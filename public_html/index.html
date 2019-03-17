@@ -1,0 +1,252 @@
+<html>
+<head>
+	<meta charset='utf-8'>
+	<title>Data to graphic</title>
+	<link rel="icon" type="image/ico" href="favicon.ico" />
+	<script src='script_for_table.js'></script>
+	<link rel="stylesheet" type="text/css" href="style_for_table.css">
+	<!-- <style type='text/css' src='style_for_table.css'></style> -->
+	<script>
+		(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+			(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+				m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+		})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+
+		ga('create', 'UA-57279938-2', 'auto');
+		ga('send', 'pageview');
+
+	</script>
+	<meta content='
+	to feed in process statistical data record graphic online 9,
+	information results text format to plot diagram graph road map chart coordinate graph sheet curve line 16,
+	statistics visualisation 2,
+	simple easy quick 3,
+	image picture 2,
+	array matrix massif variable from file 6,
+	axis x y coordinate position value import magnitude consequence quantity result outcome 12,
+	+ - = 73,
+	show make compose create construct build draw form trace lay out represent picture progress yield 15,
+	a lot many points findings 5' name='keywords'/>
+</head>
+<body>
+<div id="container">
+	<div id="header">&alpha; - version</div>
+
+	<div class="middle">
+		<!--_____________________________________________________________________________________________________________-->
+		<span class="paragraph">Chose data format please:</span><br>
+		X&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;Y<br>
+		<span style="color: grey;">Works only if x<sub>step</sub> is invariable and x is consecutive</span><br>
+		<div id="dataFormats">
+			<div class="dataFormat" id="setDataFormat11" onclick="setDataFormat('setDataFormat11')">
+				<textarea readonly>200	.	1.027
+200.1	.	1.05</textarea><br>num semicolons point? semicolons num
+			</div>
+			<div class="dataFormat" id="setDataFormat11+" onclick="setDataFormat('setDataFormat11+')">
+				<textarea readonly>200		0
+200.1		0</textarea><br>num semicolons num
+			</div>
+			<div class="dataFormat" id="setDataFormat12" onclick="setDataFormat('setDataFormat12')">
+				<textarea readonly>200,00,-0,002
+200,10,-0,002</textarea><br>6_digits separators? 6_digits
+			</div>
+			<div class="dataFormat" id="setDataFormat21" onclick="setDataFormat('setDataFormat21')">
+				<textarea readonly wrap="hard" style="width:300;">	379.18		93.54
+	380.06		93.43</textarea><br>semicolon number semicolons number
+			</div>
+			<div class="dataFormat" id="setDataFormat31" onclick="setDataFormat('setDataFormat31')">
+				<textarea readonly wrap="hard">1.33387,0.59967
+1.33459,0.59906</textarea><br>number comma number
+			</div>
+			<div class="dataFormat" id="setDataFormat41" onclick="setDataFormat('setDataFormat41')">
+				<textarea readonly wrap="hard">1.33387 0.59967
+1.33459 0.59906</textarea><br>number space number
+			</div>
+		</div>
+		<!--_____________________________________________________________________________________________________________-->
+		<span class="paragraph">Put data here:</span><br>
+		<textarea id="textareaGraphicString"></textarea>
+		<br><button onclick="buildGraphic()">Go!</button><br>
+		<span id="graphicType">Underfined type.</span><br>
+
+		<div id="result">
+
+			<div id = 'leftOfTheGraphic'>
+				<h2>Samples:</h2>
+				<span class="sample">T, %</span>
+				<span class="sample">R, %</span>
+				<span class="sample">λ, nm</span>
+				<span class="sample">λ, µm</span>
+				<!--<span class="sample">∠</span>-->
+				<span class="sample">∠</span>
+				<span class="sample">°</span>
+				<span class="sample">º</span>
+				<span class="sample">A<sub>b</sub><sup>c</sup> = A&lt;sub&gt;b&lt;/sub&gt;&lt;sup&gt;c&lt;/sup&gt;</span>
+
+			</div>
+			<div id = 'rightOfTheGraphic'>
+				<h2>Links:</h2>
+				<span class="sample, leftText"><a href="http://en.wikipedia.org/wiki/Plot_%28graphics%29">A plot is a graphical technique for representing a data set, usually as a graph showing the relationship between two or more variables. The plot can be drawn by hand or by a mechanical or electronic plotter. Graphs are a visual representation of the relationship between variables, very useful for humans who can quickly derive an understanding which would not come from lists of values. Graphs can also be used to read off the value of an unknown variable plotted as a function of a known one. Graphs of functions are used in mathematics, sciences, engineering, technology, finance, and other areas.</a></span>
+
+
+			</div>
+			<div id="forGraphic">
+				<div id="forGraphic2">
+					<div class="right" >
+						<div style=" float:right;">
+							y<sub>max</sub> =
+							<input type="text" id="maxY" size="4" value=""><br>
+							<!--<button onclick="changeGraphicVerticalDiapasonChangeable()">Change y<sub>max</sub></button><br>-->
+							<!--<button onclick="changeLeftRightX( +document.getElementById('maxY').value,  +document.getElementById('minY').value, +document.getElementById('leftX').value, +document.getElementById('rightX').value)">Change y<sub>max</sub></button><br>
+							-->
+							right x =&nbsp;<input type="text" id="rightX" size="4" value=""> <br>
+						</div>
+						<div style="float:right;">
+							y<sub>min</sub> =
+							<input type="text" id="minY" size="4" value=""> <!--&nbsp;&nbsp-->
+							<br>
+							left x =&nbsp;<input type="text" id="leftX" size="4" value="">
+							<sub></sub>
+						</div>
+						<div class="endDiv"></div>
+						<div style="text-align: center;">
+							<button onclick="
+							showRectangle(
+								+document.getElementById('maxY'  ).value,
+								+document.getElementById('minY'  ).value,
+								+document.getElementById('leftX' ).value,
+								+document.getElementById('rightX').value
+								)
+								">Change diapason</button>
+						</div>
+
+					</div>
+
+					<!--
+					<button onclick="changeGraphicVerticalDiapason(104)">y = 100%</button>
+					<button onclick="changeGraphicVerticalDiapason(0)">y = max</button><br>
+
+					<button onclick="changeYCaption('T')">T, %</button>
+					<button onclick="changeYCaption('R')">R, %</button><br><br>
+					-->
+					<br>
+					Y caption: <input type="text" id="yChangeCaption" size="30" value="T, %"  oninput="changeCaption()"><br>
+					X caption: <input type="text" id="xChangeCaption" size="30" value="λ, nm" oninput="changeCaption()"><br>
+					<br>
+
+					<span id="yCaption">T, %</span><br>
+
+					<canvas id="graphic"         width="1000" height="500"></canvas>
+					<canvas id="glassForGraphic" width="1000" height="500"></canvas>
+
+					<div class="rightText">
+						<span id="xCaption">λ, nm</span>
+					</div>
+					<br>
+				</div>
+				<!--<div style="display: inline-block;" class="endDiv">11111</div> 222222 -->
+				<button onclick="download()">Save image</button>
+
+			</div>
+		</div>
+		<div id="extraApplications">
+			<div id="interpolation" class="extraApplication">
+				<h3>Interpolation</h3>
+				x<sub>new<sub>start</sub></sub> =
+				<input type="text" id="xNewStart" size="4" value=""><br>
+				x<sub>new<sub>step</sub></sub> =
+				<input type="text" id="xNewStep" size="4" value=""><br>
+				steps =
+				<input type="text" id="xNewSteps" size="4" value=""><br>
+				<button onclick="calcXNewEnd()">result</button>
+				<span id="xNewEnd">x<sub>new<sub>end</sub></sub> = </span>
+				<br>
+				<br>
+				<button onclick="interpolation()">Interpolation</button>
+				<br>
+				X&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+				&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspY
+				<br>
+
+				<textarea id="textareaXNewArray"></textarea>
+				<textarea id="textareaYNewArray"></textarea>
+			</div>
+			<div id="" class="extraApplication">
+				<h3>Minimum value</h3>
+				x<sub>left</sub> =
+				<input type="text" id="xLeftMinimumValue" size="4" value=""> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+				x<sub>right</sub> =
+				<input type="text" id="xRightMinimumValue" size="4" value=""><br>
+				<button onclick="getMinimumValue()">Get minimum</button><br>
+				<span id="minimumValue">y<sub>min</sub> = </span>
+			</div>
+			<div id="" class="extraApplication">
+				<h3>Maximum value</h3>
+				x<sub>left</sub> =
+				<input type="text" id="xLeftMaximumValue" size="4" value=""> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+				x<sub>right</sub> =
+				<input type="text" id="xRightMaximumValue" size="4" value=""><br>
+				<button onclick="getMaximumValue()">Get maximum</button><br>
+				<span id="maximumValue">y<sub>min</sub> = </span>
+			</div>
+			<div id="" class="extraApplication">
+				<h3 style="margin: 5 0 0 0">Exact value Y from x</h3>
+				<h4 style="margin: 0">(interpolated)</h4>
+				x<sub>exact</sub> =
+				<input type="text" id="xExactValueInput" size="4" value=""> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+				<button onclick="getYExactValue()">Get exact</button><br>
+				<span id="yExactValueOutput">y<sub>exact</sub> = </span><br>
+
+			</div>
+			<div id="yFromX" class="extraApplication">
+				<h3 style="margin: 5 0 0 0">Exact value X from y</h3>
+				<h4 style="margin: 0">(interpolated)</h4>
+				x<sub>left</sub> =
+				<input type="text" id="xLeftExactValueInput" size="4" value=""> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+				x<sub>right</sub> =
+				<input type="text" id="xRightExactValueInput" size="4" value=""><br>
+				y<sub>exact</sub> =
+				<input type="text" id="yExactValueInput" size="4" value=""> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+				<button onclick="getXExactValue()">Get exact</button><br>
+				<span id="xExactValueOutput">x<sub>exact</sub> = </span>
+			</div>
+			<div id="steepness" class="extraApplication">
+				<h3>Steepness</h3>
+				<label>
+					<input type="radio" name="steepnessRadio" value="1" checked="checked" > 1 &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+				</label>
+				<label>
+					<input type="radio" name="steepnessRadio" value="100"                 > 100% &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+					<br>
+				</label>
+				x<sub>left</sub> =
+				<input type="text" id="xLeftSteepnessInput" size="4" value=""> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+				x<sub>right</sub> =
+				<input type="text" id="xRightSteepnessInput" size="4" value=""><br>
+
+
+				<button onclick="getSteepnessValue()">Get steepness</button><br>
+				<span id="x10ValueOutput">x<sub>10%</sub> = </span><br>
+				<span id="x50ValueOutput">x<sub>50%</sub> = </span><br>
+				<span id="xSteepnessValueOutput">y<sub>10%</sub>/y<sub>50%</sub> = </span>
+			</div>
+			<div id="average" class="extraApplication">
+				<h3>Average</h3>
+				x<sub>left</sub> =
+				<input type="text" id="xLeftAverage" size="4" value=""> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
+				x<sub>right</sub> =
+				<input type="text" id="xRightAverage" size="4" value=""><br>
+				<button onclick="getAverage()">Get average</button><br>
+				<span id="averageValue">Average = </span>
+			</div>
+		</div>
+
+
+			<!--_____________________________________________________________________________________________________________-->
+	</div>
+		<canvas id="void" width="1" height="100"></canvas>
+	<div id="footer"><span color="grey">Made by OleksiiZhyglov@gmail.com</span></div>
+</div>
+
+</body>
+</html>
