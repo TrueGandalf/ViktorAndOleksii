@@ -110,6 +110,9 @@ function buildGraphic() {
 	if (dataFormat === '31') document.getElementById("graphicType").innerHTML = "Type: comma";
 	if (dataFormat === '41') document.getElementById("graphicType").innerHTML = "Type: common";
 
+	let  currentArrayY = [];
+	ordinatArrays.push(currentArrayY);
+
 
 
 	if ( dataFormat === '11' ) {
@@ -235,10 +238,7 @@ function buildGraphic() {
 		}
 	}
 	else if ( dataFormat === '41' ) {
-		//debugger;
-
-		let  currentArrayY = [];
-		ordinatArrays.push(currentArrayY);
+		//debugger;		
 
 
 		var startIndex = 0;//start index of first element
@@ -272,11 +272,12 @@ function buildGraphic() {
 		alert("Array doesn't constructed!");
 		return;
 	}
-	if (!arrayX.length || !arrayY.length) {
+	debugger;
+	if (!arrayX.length || !currentArrayY.length) {
 		alert("Array doesnt constructed!");
 		return;
 	}
-		showGraphic(undefined, undefined, undefined, undefined);
+		showGraphic(undefined, undefined, undefined, undefined, currentArrayY);
 
 }
 function Graphic(){
@@ -332,7 +333,7 @@ function buildCustomGraphic(whetherXToMarker, contentXTo, whetherYAfterMarker, c
     }
 
 }
-function showGraphic(max, min, leftX, rightX ) {
+function showGraphic(max, min, leftX, rightX, currentArrayY) {
 	document.getElementById("graphic").width = document.getElementById("graphic").width;// redraw canvas
 
 
@@ -358,7 +359,7 @@ function showGraphic(max, min, leftX, rightX ) {
 	}
 
 	if (!max) {
-		var topY = Math.max.apply(Math, arrayY);
+		var topY = Math.max.apply(Math, currentArrayY);
 		topY = (topY - bottomY)*1.04 + bottomY;
 	} else {
 		var topY = max;
@@ -378,7 +379,11 @@ function showGraphic(max, min, leftX, rightX ) {
 	currentMin = bottomY;
 
 	drawLines(graphic_context, graphic_height, graphic_width, leftX, (rightX - leftX), rightX, verticalDiapason, bottomY);
-	drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY);
+	currentColor = "#00f";
+	drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY, currentArrayY, currentColor);
+	currentColor = "#0ff";
+	currentArrayY = currentArrayY.map(x=>x/2);
+	drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY, currentArrayY, currentColor);
 	
 }
 function drawLines(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY) {
@@ -480,7 +485,8 @@ function drawLines(graphic_context, graphic_height, graphic_width, leftX, horizo
 	//=====================================================================================================================
 
 }
-function drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY) {
+function drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason,
+ rightX, verticalDiapason, bottomY, currentArrayY, currentColor) {
 
 	//graphic_context.moveTo( (arrayX[0]-leftX)/(rightX-leftX)*graphic_width , graphic_height);
 
@@ -488,14 +494,14 @@ function drawGraphic(graphic_context, graphic_height, graphic_width, leftX, hori
 	var newElement = 0;
 	for (var x = 1; x < graphic_width; x++ ) {
 		//graphic_context.lineTo( ( ( x*horizontalDiapason/(rightX-leftX) )+( (arrayX[0]-leftX)/(rightX-leftX)*graphic_width ) ) , graphic_height-( ( ( arrayY[ Math.floor(  x/graphic_width*(arrayY.length -1)) ] - bottomY) / (  verticalDiapason ) *graphic_height)+1) );
-		newElement = Math.floor(  x/(graphic_width-1)*(arrayY.length -1));
+		newElement = Math.floor(  x/(graphic_width-1)*(currentArrayY.length -1));
 		if (newElement !== element) {
-			graphic_context.lineTo(( ( x * horizontalDiapason / (rightX - leftX) ) + ( (arrayX[0] - leftX) / (rightX - leftX) * graphic_width ) ), graphic_height - ( ( ( arrayY[Math.floor(x / (graphic_width - 1) * (arrayY.length - 1))] - bottomY) / (  verticalDiapason ) * graphic_height) + 1));
+			graphic_context.lineTo(( ( x * horizontalDiapason / (rightX - leftX) ) + ( (arrayX[0] - leftX) / (rightX - leftX) * graphic_width ) ), graphic_height - ( ( ( currentArrayY[Math.floor(x / (graphic_width - 1) * (currentArrayY.length - 1))] - bottomY) / (  verticalDiapason ) * graphic_height) + 1));
 			element = newElement;
 		}
 	}
 
-	graphic_context.strokeStyle = "#00f";
+	graphic_context.strokeStyle = currentColor;
 	graphic_context.lineWidth = 2;
 	graphic_context.stroke();
 	graphic_context.beginPath();
