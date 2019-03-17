@@ -116,11 +116,12 @@ function buildGraphic() {
 			arrayX[i] = +graphicString.substring(startIndex, endIndex);
 			while (graphicString.substring(endIndex, endIndex+1) =="	" || graphicString.substring(endIndex, endIndex+1) == "." ) {
 				endIndex++;
+	let  currentArrayY = [];
+	ordinatArrays.push(currentArrayY);
 			}
 			startIndex = endIndex;//for y
 			endIndex = graphicString.indexOf("\n", startIndex);// for y
 			if (!(~endIndex)) endIndex = graphicString.length;//from 41
-
 		}
 		if (!columnSwitch) {
 			arrayY[i] = +graphicString.substring(startIndex, endIndex);
@@ -189,7 +190,7 @@ function buildCustomGraphic(whetherXToMarker, contentXTo, whetherYAfterMarker, c
     }
 
 }
-function showGraphic(max, min, leftX, rightX ) {
+function showGraphic(max, min, leftX, rightX, currentArrayY) {
 	document.getElementById("graphic").width = document.getElementById("graphic").width;// redraw canvas
 
 
@@ -215,7 +216,7 @@ function showGraphic(max, min, leftX, rightX ) {
 	}
 
 	if (!max) {
-		var topY = Math.max.apply(Math, arrayY);
+		var topY = Math.max.apply(Math, currentArrayY);
 		topY = (topY - bottomY)*1.04 + bottomY;
 	} else {
 		var topY = max;
@@ -234,7 +235,11 @@ function showGraphic(max, min, leftX, rightX ) {
 	currentMin = bottomY;
 
 	drawLines(graphic_context, graphic_height, graphic_width, leftX, (rightX - leftX), rightX, verticalDiapason, bottomY);
-	drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY);
+	currentColor = "#00f";
+	drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY, currentArrayY, currentColor);
+	currentColor = "#0ff";
+	currentArrayY = currentArrayY.map(x=>x/2);
+	drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY, currentArrayY, currentColor);
 	
 }
 function drawLines(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY) {
@@ -336,7 +341,8 @@ function drawLines(graphic_context, graphic_height, graphic_width, leftX, horizo
 	//=====================================================================================================================
 
 }
-function drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY) {
+function drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason,
+ rightX, verticalDiapason, bottomY, currentArrayY, currentColor) {
 
 	//graphic_context.moveTo( (arrayX[0]-leftX)/(rightX-leftX)*graphic_width , graphic_height);
 
@@ -344,14 +350,14 @@ function drawGraphic(graphic_context, graphic_height, graphic_width, leftX, hori
 	var newElement = 0;
 	for (var x = 1; x < graphic_width; x++ ) {
 		//graphic_context.lineTo( ( ( x*horizontalDiapason/(rightX-leftX) )+( (arrayX[0]-leftX)/(rightX-leftX)*graphic_width ) ) , graphic_height-( ( ( arrayY[ Math.floor(  x/graphic_width*(arrayY.length -1)) ] - bottomY) / (  verticalDiapason ) *graphic_height)+1) );
-		newElement = Math.floor(  x/(graphic_width-1)*(arrayY.length -1));
+		newElement = Math.floor(  x/(graphic_width-1)*(currentArrayY.length -1));
 		if (newElement !== element) {
-			graphic_context.lineTo(( ( x * horizontalDiapason / (rightX - leftX) ) + ( (arrayX[0] - leftX) / (rightX - leftX) * graphic_width ) ), graphic_height - ( ( ( arrayY[Math.floor(x / (graphic_width - 1) * (arrayY.length - 1))] - bottomY) / (  verticalDiapason ) * graphic_height) + 1));
+			graphic_context.lineTo(( ( x * horizontalDiapason / (rightX - leftX) ) + ( (arrayX[0] - leftX) / (rightX - leftX) * graphic_width ) ), graphic_height - ( ( ( currentArrayY[Math.floor(x / (graphic_width - 1) * (currentArrayY.length - 1))] - bottomY) / (  verticalDiapason ) * graphic_height) + 1));
 			element = newElement;
 		}
 	}
 
-	graphic_context.strokeStyle = "#00f";
+	graphic_context.strokeStyle = currentColor;
 	graphic_context.lineWidth = 2;
 	graphic_context.stroke();
 	graphic_context.beginPath();
