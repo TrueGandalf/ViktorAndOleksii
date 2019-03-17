@@ -100,185 +100,42 @@ function buildGraphic() {
 	var GrraphicTypeIndicator_1_1 = '"""St';
 	var GrraphicTypeIndicator_1_2 = '"Stor';
 	var GrraphicTypeIndicator_2_1 = 'Date:';
-	//graphicTypeString = 'comma';
 	arrayX.length = 0;
 	arrayY.length = 0;
 
-	if (dataFormat === '11') document.getElementById("graphicType").innerHTML = "Type: 1 a";
-	if (dataFormat === '12') document.getElementById("graphicType").innerHTML = "Type: 1 b";
-	if (dataFormat === '21') document.getElementById("graphicType").innerHTML = "Type: 2 a";
-	if (dataFormat === '31') document.getElementById("graphicType").innerHTML = "Type: comma";
-	if (dataFormat === '41') document.getElementById("graphicType").innerHTML = "Type: common";
+	var startIndex = 0;
+	var columnSwitch = false;
 
-
-
-	if ( dataFormat === '11' ) {
-		var startIndex = 0;
-		//for (var i = 1; i <= 2; i++) {
-		//	startIndex = graphicString.indexOf("\n", ++startIndex);
-		//}
-		//startIndex++;
-		var columnSwitch = false;
-
-		var endIndex = graphicString.indexOf("	", startIndex);
-		var i = -1;
-		while ( (graphicString.length >= endIndex) && ~endIndex && ~startIndex) {//Stops on ~endIndex	//from 41
-		//while (~graphicString.indexOf("\n", endIndex) && ~endIndex && ~startIndex) {//Stops on ~endIndex
-			columnSwitch = !columnSwitch;
-			if (columnSwitch) {
-				i++;
-				arrayX[i] = +graphicString.substring(startIndex, endIndex);
-				while (graphicString.substring(endIndex, endIndex+1) =="	" || graphicString.substring(endIndex, endIndex+1) == "." ) {
-					endIndex++;
-				}
-				startIndex = endIndex;//for y
-				endIndex = graphicString.indexOf("\n", startIndex);// for y
-				if (!(~endIndex)) endIndex = graphicString.length;//from 41
-
+	var endIndex = graphicString.indexOf("	", startIndex);
+	var i = -1;
+	while ( (graphicString.length >= endIndex) && ~endIndex && ~startIndex) {//Stops on ~endIndex	//from 41
+	//while (~graphicString.indexOf("\n", endIndex) && ~endIndex && ~startIndex) {//Stops on ~endIndex
+		columnSwitch = !columnSwitch;
+		if (columnSwitch) {
+			i++;
+			arrayX[i] = +graphicString.substring(startIndex, endIndex);
+			while (graphicString.substring(endIndex, endIndex+1) =="	" || graphicString.substring(endIndex, endIndex+1) == "." ) {
+				endIndex++;
 			}
-			if (!columnSwitch) {
-				arrayY[i] = +graphicString.substring(startIndex, endIndex);
-				startIndex = ++endIndex;//for x
-				endIndex = graphicString.indexOf("	", startIndex);//for x
-			}
+			startIndex = endIndex;//for y
+			endIndex = graphicString.indexOf("\n", startIndex);// for y
+			if (!(~endIndex)) endIndex = graphicString.length;//from 41
+
 		}
-	}
-	else if ( dataFormat === '12' ) {
-		var startIndex = 0;
-		//for (var i = 1; i <= 2; i++) {
-		//	startIndex = graphicString.indexOf("\n", ++startIndex);
-		//}
-		//startIndex++;
-		graphicString = graphicString.replace(new RegExp(",",'g'),".");//opposite!
-		var columnSwitch = false;
-		var endIndex = startIndex + 6;
-		var i = -1;
-		while ( (graphicString.length >= endIndex) && ~endIndex && ~startIndex) {//Stops on ~endIndex	//from 41
-		//while (~graphicString.indexOf("\n", endIndex) && ~endIndex && ~startIndex) {//Stops on ~endIndex
-			columnSwitch = !columnSwitch;
-			if (columnSwitch) {
-				i++;
-				arrayX[i] = +graphicString.substring(startIndex, endIndex);
-				startIndex = endIndex + 2;
-				endIndex = graphicString.indexOf("\n", startIndex);
-				if (!(~endIndex)) endIndex = graphicString.length;//form 41
-			}
-			if (!columnSwitch) {
-				arrayY[i] = +graphicString.substring(startIndex, endIndex);
-				startIndex = endIndex +1;
-				endIndex = startIndex+5;
-			}
-		}
-	}
-	else if ( dataFormat === '21' ) {
-		var startIndex = 0;
-		//for (var i = 1; i <= 2; i++) {
-		//	startIndex = graphicString.indexOf("\n", ++startIndex);
-		//}
-		//startIndex++;
-		var columnSwitch = false;
-
-
-
-		var endIndex = graphicString.indexOf("	", startIndex +1);
-		var i = -1;
-		while ( (graphicString.length >= endIndex) && ~endIndex && ~startIndex) {//Stops on ~endIndex	//from 41
-		//while (~graphicString.indexOf("\n", endIndex) && ~endIndex && ~startIndex) {//Stops on ~endIndex
-			columnSwitch = !columnSwitch;
-			if (columnSwitch) {
-				i++;
-				window.arrayX[i] = +graphicString.substring(startIndex, endIndex);
-				while (graphicString.substring(endIndex, endIndex+1) =="	" || graphicString.substring(endIndex, endIndex+1) == "." ) {
-					endIndex++;
-				}
-				startIndex = endIndex;
-				endIndex = graphicString.indexOf("\n", startIndex);
-				if (!(~endIndex)) endIndex = graphicString.length;//form 41
-
-			}
-			if (!columnSwitch) {
-				window.arrayY[i] = +graphicString.substring(startIndex, endIndex);
-				startIndex = ++endIndex;
-				endIndex = graphicString.indexOf("	", startIndex +1);
-			}
-		}
-	}
-	else if ( dataFormat === '31' ) {
-		//debugger;
-		var startIndex = 0;
-		var columnSwitch = false;
-
-
-		var endIndex = graphicString.indexOf(",", startIndex +1);
-		var i = -1;
-		//while (~graphicString.indexOf("\n", endIndex) && ~endIndex && ~startIndex) {//Stops on ~endIndex
-		while ( (graphicString.length >= endIndex) && ~endIndex && ~startIndex) {//Stops on ~endIndex	//from 41
-			columnSwitch = !columnSwitch;
-			if (columnSwitch) {
-				i++;
-				//arrayX[i] = +graphicString.substring(startIndex, endIndex);
-				window.arrayX[i] = +graphicString.substring(startIndex, endIndex);
-				while (graphicString.substring(endIndex, endIndex+1) =="," || graphicString.substring(endIndex, endIndex+1) == "," ) {
-					endIndex++;
-				}
-				startIndex = endIndex;
-				endIndex = graphicString.indexOf("\n", startIndex);
-				if (!(~endIndex)) endIndex = graphicString.length;//form 41
-
-			}
-			if (!columnSwitch) {
-				//arrayY[i] = +graphicString.substring(startIndex, endIndex);
-				window.arrayY[i] = +graphicString.substring(startIndex, endIndex);
-				startIndex = ++endIndex;
-				endIndex = graphicString.indexOf(",", startIndex +1);
-			}
-		}
-	}
-	else if ( dataFormat === '41' ) {
-		//debugger;
-
-		let  currentArrayY = [];
-		ordinatArrays.push(currentArrayY);
-
-
-		var startIndex = 0;//start index of first element
-		var columnSwitch = false;// determines whether x or y are reading now
-
-		var endIndex = graphicString.indexOf(" ", startIndex);//looking for end of x, it is space symbol
-		var i = -1;
-		while ( (graphicString.length >= endIndex) && ~endIndex && ~startIndex) {//Stops on ~endIndex
-		//works while length of the string(text) is greater (or equal) then endIndex value and stops when search indexes = -1
-			columnSwitch = !columnSwitch;
-			if (columnSwitch) {
-				i++;
-				arrayX[i] = +graphicString.substring(startIndex, endIndex);
-				while (graphicString.substring(endIndex, endIndex+1) ==" " ) {//|| graphicString.substring(endIndex, endIndex+1) == "."
-					endIndex++;
-				}
-				startIndex = endIndex;//for y
-				endIndex = graphicString.indexOf("\n", startIndex);//for y
-				if (!(~endIndex)) endIndex = graphicString.length;
-
-			}
-			if (!columnSwitch) {
-				currentArrayY[i] = +graphicString.substring(startIndex, endIndex);
-				startIndex = ++endIndex;////for x
-				endIndex = graphicString.indexOf(" ", startIndex);//for x
-			}
+		if (!columnSwitch) {
+			arrayY[i] = +graphicString.substring(startIndex, endIndex);
+			startIndex = ++endIndex;//for x
+			endIndex = graphicString.indexOf("	", startIndex);//for x
 		}
 	}
 
-	else {
-		alert("Array doesn't constructed!");
-		return;
-	}
 	if (!arrayX.length || !arrayY.length) {
 		alert("Array doesnt constructed!");
 		return;
 	}
-		showGraphic(undefined, undefined, undefined, undefined);
-
+	showGraphic(undefined, undefined, undefined, undefined);
 }
+
 function Graphic(){
     
 }
@@ -367,7 +224,6 @@ function showGraphic(max, min, leftX, rightX ) {
 	var horizontalDiapason = arrayX[arrayX.length-1] - window.arrayX[0];
 
 	var verticalDiapason = topY - bottomY;
-
 	if ( !(leftX-rightX)  || !(topY-bottomY) ) {
 		alert("You are suspicious, what do you want one more time? \n X_min = X_max ? \n Y_min=Y_max ? \n O_o");// \n x<sub>min</sub>=x<sub>max</sub>? \n y<sub>min</sub>=y<sub>max</sub> \n
 		return;
@@ -987,41 +843,6 @@ function precision(num) {
 	return result;
 }
 function redraw() {document.getElementById("glassForGraphic").width = document.getElementById("glassForGraphic").width;}
-var dataFormat = '0';
-function setDataFormat(id) {
-	//alert(document.getElementById(id).style.cssText.length);
-	document.getElementById('setDataFormat11').style.cssText = '';
-	document.getElementById('setDataFormat11+').style.cssText = '';
-	document.getElementById('setDataFormat12').style.cssText = '';
-	document.getElementById('setDataFormat21').style.cssText = '';
-	document.getElementById('setDataFormat31').style.cssText = '';
-	document.getElementById('setDataFormat41').style.cssText = '';
-	document.getElementById(id).style.cssText = 'border: 10px solid green; background: green;';
-
-	switch (id) {
-		case "setDataFormat11":
-			dataFormat = "11";
-			break;
-		case "setDataFormat11+":
-			dataFormat = "11";
-			break;
-		case "setDataFormat12":
-			dataFormat = "12";
-			break;
-		case "setDataFormat21":
-			dataFormat = "21";
-			break;
-		case "setDataFormat31":
-			dataFormat = "31";
-			break;
-		case "setDataFormat41":
-			dataFormat = "41";
-			break;
-		default:
-			dataFormat = '0';
-			break;
-	}
-}
 
 function download() {
 	var canvas = document.getElementById("graphic");
@@ -1045,7 +866,7 @@ window.onload = function() {
 	//canvasLive.onmouseout = stopDrawing;
 	canvasLive.onmousemove = draw;
 	//***********************************************************
-	setDataFormat('setDataFormat11+');
+	
 
     $('#customDataFormat').hide('slow');
     hideAllShowOne("");//#interpolationDiv
@@ -1151,4 +972,4 @@ function copyCommaText(id) {
 function putCommaText(id) {
     document.getElementById(id).value = commaText;
     alert("Исходный текст с запятыми восстановлен.");
-}putCommaText
+}
