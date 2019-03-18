@@ -1,94 +1,4 @@
-function TwoDimensionalArray() {
-    this.numberOfStrings = 1 || 2;// данные состоят из одной или двух текстовых строк
-    this.onlyString = "";
-    this.firstString = "";
-    this.secondString = "";
 
-    this.pasrsingMethod = "string" || "object";// строка или обьект, предпочтительно обьект
-    this.arrayX = [];
-    this.arrayY = [];
-}
-
-function defineParsingMethod(TwoDimensionalArrayName) {
-    TwoDimensionalArrayName.pasrsingMethod = {
-        startXElement : "",
-        endXElement   : "" || number,
-        startYElement : "",
-        endYElement   : "" || number
-    }
-}
-function universalParsing() {
-
-    if (this.numberOfStrings == 1) {
-
-        var onlyString = this.onlyString;
-
-        this.arrayX.length = [];
-        this.arrayY.length = [];
-
-        var startXElement = this.pasrsingMethod.startXElement;
-        var endXElement = this.pasrsingMethod.endXElement;
-        var startYElement = this.pasrsingMethod.startYElement;
-        var endYElement = this.pasrsingMethod.endYElement;
-
-        var startIndex = startXElement+1 || 0;
-        // «индекс начала элемента данных», присваиваем ему ноль или указаталь начала элемента х если он есть, поиск начнется с него ВКЛЮЧИТЕЛЬНО
-        // +1 так как новый поиск начинается после использованного указателя
-        var columnSwitch = false;
-        // «выбор колонки» первая или вторая, то есть в игрек или в икс мы записываем данные
-
-        if (endXElement.is)  {}
-        var endIndex = onlyString.indexOf(endXElement, startIndex); sdfsfsd//может быть задан числом
-        // «индекс конца элемента данных», присваиваем ему указатель конца элемента икс, то есть индекс на которм стоит указатель, элемент закончится на нем НЕВКЛЮЧИТЕЛЬНО
-        var i = -1;
-        // индекс, -1 так как в начале блока будет инкрементация и получится 0
-
-
-        while ( (onlyString.length >= endIndex) && ~endIndex && ~startIndex) {//Stops on ~endIndex
-            // парсим пока 1) длина единой строки больше или равна «индексу конца элемента данных»
-            //          и  2) находится «индекс конца элемента данных»
-            //          и  3) находится «индекс начала элемента данных»
-
-            columnSwitch = !columnSwitch;
-            // меняем массив для записи, в первый раз и будем записываем в икс (тру)
-
-            if (columnSwitch) {
-            // в зависимости от массива для записи у нас разные инструкции
-
-                i++;
-                //увеличиваем индекс, в первый раз он становится нулевым
-
-                this.arrayX[i] = +onlyString.substring(startIndex, endIndex);
-                //записываем данные в массив икс, включительно невключительно
-
-                //теперь нужно определить индексы элемента для игрек (криво, лучше это перенести в блок для игрек а из него вставить в этот блок определение для икс, но изначально я сделал так, и это можно оставить)
-                //начнем поиск начала игрек если он задан
-                if (startYElement) {
-                    startIndex = onlyString.indexOf( endIndex+1, startIndex);
-                } else {//иначе парсим сразу после конца прошлогоэлеметна или конца! указателя конца прошлого элемента
-
-                }
-                startIndex = endIndex;//for y
-                endIndex = onlyString.indexOf("\n", startIndex);// for y
-                if (!(~endIndex)) endIndex = onlyString.length;//from 41
-
-            }
-            if (!columnSwitch) {
-                arrayY[i] = +onlyString.substring(startIndex, endIndex);
-                startIndex = ++endIndex;//for x
-                endIndex = onlyString.indexOf("	", startIndex);//for x
-            }
-        }
-
-
-
-
-    } else if (this.numberOfStrings == 2) {
-
-    } else {
-        throw Error;
-    }
-}
 
 var arrayX = [];
 var arrayY = [];
@@ -96,7 +6,8 @@ var ordinatArrays = [];
 var currentLeftX, currentRightX, currentMax, currentMin;
 var allLeftX, allRightX;
 function buildGraphic() {
-	graphNum = 4;
+	let timeStart = performance.now();
+	graphNum = 0;//4
 	arrayX.length = 0;
 	arrayY.length = 0;
 
@@ -118,16 +29,8 @@ function buildGraphic() {
 		showGraphic(undefined, undefined, undefined, undefined, currentArrayY, "graphic");
 		
 		showGraphic(undefined, undefined, undefined, undefined, currentArrayY, "summaryGraphic");
-
-}
-
-function Graphic(){
-    
-}
-var graphicNumber = 0;
-var graphics = [];
-function newGraphic() {
-    graphics[graphicNumber] = new Graphic();
+	let timeEnd =  performance.now();
+	console.log("Time " + (timeEnd - timeStart));
 }
 function buildCustomGraphic(whetherXToMarker, contentXTo, whetherYAfterMarker, contentYAfter,
                             whetherYToMarker, contentYTo, whetherXAfterMarker, contentXAfter) {
@@ -175,6 +78,7 @@ function buildCustomGraphic(whetherXToMarker, contentXTo, whetherYAfterMarker, c
 
 }
 function showGraphic(max, min, leftX, rightX, currentArrayY, divId) {
+	let showGraphicStart = performance.now();
 	document.getElementById(divId).width = document.getElementById(divId).width;// redraw canvas
 
 
@@ -236,7 +140,8 @@ function showGraphic(max, min, leftX, rightX, currentArrayY, divId) {
 	//currentArrayY = currentArrayY.map(x=>x/2);
 	//drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY, currentArrayY, currentColor);
 
-	
+	let showGraphicEnd = performance.now();
+	console.log("one showGraphic : " + (showGraphicEnd - showGraphicStart));
 }
 function drawLines(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY) {
 
@@ -676,7 +581,7 @@ function changeLeftRightX(max, min, leftX, rightX) {
 	showGraphic(max, min, leftX, rightX, ordinatArrays[0], "graphic");
 }
 function showRectangle(max, min, leftX, rightX) {
-
+	//debugger;
 	if(arrayX.length == 0) {
 		//alert("First you need to create a data array!\nLoad data and push \"Go! \"");
 		return;
@@ -781,9 +686,9 @@ function showRectangle(max, min, leftX, rightX) {
 	param1-paramN - передаваемые параметры.
 	*/
 
-	setTimeout( changeLeftRightX, 500, +document.getElementById('maxY').value,
+	setTimeout( changeLeftRightX, 0, +document.getElementById('maxY').value,
 		+document.getElementById('minY').value, +document.getElementById('leftX').value, +document.getElementById('rightX').value);
-	setTimeout(redraw, 500);
+	setTimeout(redraw, 0);
 
 
 }
@@ -938,6 +843,7 @@ function draw(e) {
 function drawScope(e) {
 	if (isScopeDrawing == true)
 	{
+		let oneDrowStart = performance.now();
 		// Определяем текущие координаты указателя мыши
 		var x = e.pageX - canvasScope.offsetLeft;
 		var y = e.pageY - canvasScope.offsetTop;
@@ -962,8 +868,8 @@ function drawScope(e) {
 			+document.getElementById('leftX').value,
 			+document.getElementById('rightX').value
 		)
-
-
+		let oneDrowEnd = performance.now();
+		console.log("one drow " + (oneDrowEnd-oneDrowStart) );
 	}
 }
 function stopDrawing(e) {
