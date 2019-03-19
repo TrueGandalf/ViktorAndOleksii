@@ -1,101 +1,13 @@
-function TwoDimensionalArray() {
-    this.numberOfStrings = 1 || 2;// данные состоят из одной или двух текстовых строк
-    this.onlyString = "";
-    this.firstString = "";
-    this.secondString = "";
 
-    this.pasrsingMethod = "string" || "object";// строка или обьект, предпочтительно обьект
-    this.arrayX = [];
-    this.arrayY = [];
-}
-
-function defineParsingMethod(TwoDimensionalArrayName) {
-    TwoDimensionalArrayName.pasrsingMethod = {
-        startXElement : "",
-        endXElement   : "" || number,
-        startYElement : "",
-        endYElement   : "" || number
-    }
-}
-function universalParsing() {
-
-    if (this.numberOfStrings == 1) {
-
-        var onlyString = this.onlyString;
-
-        this.arrayX.length = [];
-        this.arrayY.length = [];
-
-        var startXElement = this.pasrsingMethod.startXElement;
-        var endXElement = this.pasrsingMethod.endXElement;
-        var startYElement = this.pasrsingMethod.startYElement;
-        var endYElement = this.pasrsingMethod.endYElement;
-
-        var startIndex = startXElement+1 || 0;
-        // «индекс начала элемента данных», присваиваем ему ноль или указаталь начала элемента х если он есть, поиск начнется с него ВКЛЮЧИТЕЛЬНО
-        // +1 так как новый поиск начинается после использованного указателя
-        var columnSwitch = false;
-        // «выбор колонки» первая или вторая, то есть в игрек или в икс мы записываем данные
-
-        if (endXElement.is)  {}
-        var endIndex = onlyString.indexOf(endXElement, startIndex); sdfsfsd//может быть задан числом
-        // «индекс конца элемента данных», присваиваем ему указатель конца элемента икс, то есть индекс на которм стоит указатель, элемент закончится на нем НЕВКЛЮЧИТЕЛЬНО
-        var i = -1;
-        // индекс, -1 так как в начале блока будет инкрементация и получится 0
-
-
-        while ( (onlyString.length >= endIndex) && ~endIndex && ~startIndex) {//Stops on ~endIndex
-            // парсим пока 1) длина единой строки больше или равна «индексу конца элемента данных»
-            //          и  2) находится «индекс конца элемента данных»
-            //          и  3) находится «индекс начала элемента данных»
-
-            columnSwitch = !columnSwitch;
-            // меняем массив для записи, в первый раз и будем записываем в икс (тру)
-
-            if (columnSwitch) {
-            // в зависимости от массива для записи у нас разные инструкции
-
-                i++;
-                //увеличиваем индекс, в первый раз он становится нулевым
-
-                this.arrayX[i] = +onlyString.substring(startIndex, endIndex);
-                //записываем данные в массив икс, включительно невключительно
-
-                //теперь нужно определить индексы элемента для игрек (криво, лучше это перенести в блок для игрек а из него вставить в этот блок определение для икс, но изначально я сделал так, и это можно оставить)
-                //начнем поиск начала игрек если он задан
-                if (startYElement) {
-                    startIndex = onlyString.indexOf( endIndex+1, startIndex);
-                } else {//иначе парсим сразу после конца прошлогоэлеметна или конца! указателя конца прошлого элемента
-
-                }
-                startIndex = endIndex;//for y
-                endIndex = onlyString.indexOf("\n", startIndex);// for y
-                if (!(~endIndex)) endIndex = onlyString.length;//from 41
-
-            }
-            if (!columnSwitch) {
-                arrayY[i] = +onlyString.substring(startIndex, endIndex);
-                startIndex = ++endIndex;//for x
-                endIndex = onlyString.indexOf("	", startIndex);//for x
-            }
-        }
-
-
-
-
-    } else if (this.numberOfStrings == 2) {
-
-    } else {
-        throw Error;
-    }
-}
 
 var arrayX = [];
 var arrayY = [];
 var ordinatArrays = [];
 var currentLeftX, currentRightX, currentMax, currentMin;
+var allLeftX, allRightX;
 function buildGraphic() {
-	graphNum = 4;
+	let timeStart = performance.now();
+	graphNum = 0;//4
 	arrayX.length = 0;
 	arrayY.length = 0;
 
@@ -114,17 +26,11 @@ function buildGraphic() {
 	let currentArrayY = ordinatArrays[0];
 
 		arrayX = data[graphNum].columns[0].slice(1);
-		showGraphic(undefined, undefined, undefined, undefined, currentArrayY);
-
-}
-
-function Graphic(){
-    
-}
-var graphicNumber = 0;
-var graphics = [];
-function newGraphic() {
-    graphics[graphicNumber] = new Graphic();
+		showGraphic(undefined, undefined, undefined, undefined, currentArrayY, "graphic");
+		
+		showGraphic(undefined, undefined, undefined, undefined, currentArrayY, "summaryGraphic");
+	let timeEnd =  performance.now();
+	console.log("Time " + (timeEnd - timeStart));
 }
 function buildCustomGraphic(whetherXToMarker, contentXTo, whetherYAfterMarker, contentYAfter,
                             whetherYToMarker, contentYTo, whetherXAfterMarker, contentXAfter) {
@@ -171,16 +77,17 @@ function buildCustomGraphic(whetherXToMarker, contentXTo, whetherYAfterMarker, c
     }
 
 }
-function showGraphic(max, min, leftX, rightX, currentArrayY) {
-	document.getElementById("graphic").width = document.getElementById("graphic").width;// redraw canvas
+function showGraphic(max, min, leftX, rightX, currentArrayY, divId) {
+	let showGraphicStart = performance.now();
+	document.getElementById(divId).width = document.getElementById(divId).width;// redraw canvas
 
 
 
-	var graphic_canvas = document.getElementById("graphic");
+	var graphic_canvas = document.getElementById(divId);
 	var graphic_context = graphic_canvas.getContext("2d");
 	
-	var graphic_width = document.getElementById("graphic").width;
-	var graphic_height = document.getElementById("graphic").height;
+	var graphic_width = document.getElementById(divId).width;
+	var graphic_height = document.getElementById(divId).height;
 
 	if (!leftX && !(leftX===0) ) {
 		var leftX = window.arrayX[0];
@@ -208,7 +115,7 @@ function showGraphic(max, min, leftX, rightX, currentArrayY) {
 	var verticalDiapason = topY - bottomY;
 
 	if ( !(leftX-rightX)  || !(topY-bottomY) ) {
-		alert("You are suspicious, what do you want one more time? \n X_min = X_max ? \n Y_min=Y_max ? \n O_o");// \n x<sub>min</sub>=x<sub>max</sub>? \n y<sub>min</sub>=y<sub>max</sub> \n
+		//alert("You are suspicious, what do you want one more time? \n X_min = X_max ? \n Y_min=Y_max ? \n O_o");// \n x<sub>min</sub>=x<sub>max</sub>? \n y<sub>min</sub>=y<sub>max</sub> \n
 		return;
 	}
 	currentLeftX = leftX;
@@ -216,7 +123,12 @@ function showGraphic(max, min, leftX, rightX, currentArrayY) {
 	currentMax = topY;
 	currentMin = bottomY;
 
-	drawLines(graphic_context, graphic_height, graphic_width, leftX, (rightX - leftX), rightX, verticalDiapason, bottomY);
+	if (divId == "graphic"){
+		drawLines(graphic_context, graphic_height, graphic_width, leftX, (rightX - leftX), rightX, verticalDiapason, bottomY);		
+	} else {
+		allRightX = rightX;
+		allLeftX = leftX;
+	}
 	//arrayX = data[0].columns[0].slice(1).join("\n");
 	//ordinatArrays = [];
 	//ordinatArrays = data[0].columns.slice(1).map(x=>x.slice(1));
@@ -228,7 +140,8 @@ function showGraphic(max, min, leftX, rightX, currentArrayY) {
 	//currentArrayY = currentArrayY.map(x=>x/2);
 	//drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY, currentArrayY, currentColor);
 
-	
+	let showGraphicEnd = performance.now();
+	console.log("one showGraphic : " + (showGraphicEnd - showGraphicStart));
 }
 function drawLines(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY) {
 
@@ -661,16 +574,16 @@ function changeLeftRightX(max, min, leftX, rightX) {
 		return;
 	}*/ // я перенес это в след функцию = глубже
 	if(arrayX.length == 0) {
-		alert("First you need to create a data array!\nLoad data and push \"Go! \"");
+		//alert("First you need to create a data array!\nLoad data and push \"Go! \"");
 		return;
 	}
 
-	showGraphic(max, min, leftX, rightX);
+	showGraphic(max, min, leftX, rightX, ordinatArrays[0], "graphic");
 }
 function showRectangle(max, min, leftX, rightX) {
-
+	//debugger;
 	if(arrayX.length == 0) {
-		alert("First you need to create a data array!\nLoad data and push \"Go! \"");
+		//alert("First you need to create a data array!\nLoad data and push \"Go! \"");
 		return;
 	}
 	//improve edges
@@ -747,7 +660,7 @@ function showRectangle(max, min, leftX, rightX) {
 	}
 
 	if ( !(leftX-rightX)  || !(topY-bottomY) ) {
-		alert("You are suspicious, what do you want one more time?");
+		//alert("You are suspicious, what do you want one more time?");
 		return;
 	}
 
@@ -773,9 +686,9 @@ function showRectangle(max, min, leftX, rightX) {
 	param1-paramN - передаваемые параметры.
 	*/
 
-	setTimeout( changeLeftRightX, 500, +document.getElementById('maxY').value,
+	setTimeout( changeLeftRightX, 0, +document.getElementById('maxY').value,
 		+document.getElementById('minY').value, +document.getElementById('leftX').value, +document.getElementById('rightX').value);
-	setTimeout(redraw, 500);
+	setTimeout(redraw, 0);
 
 
 }
@@ -850,24 +763,42 @@ var contextLive;
 var firstCanvasX, firstCanvasY,
 	secondCanvasX, secondCanvasY;
 
+var canvasScope;
+var contextScopeLive;
+var firstScopeCanvasX, firstScopeCanvasY,
+	secondScopeCanvasX, secondScopeCanvasY;
+
 window.onload = function() {
-	canvasLive = document.getElementById("glassForGraphic");
-	contextLive = canvasLive.getContext("2d");
+	//canvasLive = document.getElementById("glassForGraphic");
+	//contextLive = canvasLive.getContext("2d");
 
 	// Подключаем требуемые для рисования события
-	canvasLive.onmousedown = startDrawing;
-	canvasLive.onmouseup = stopDrawing;
-	window.onmouseup = stopDrawing;
+	//canvasLive.onmousedown = startDrawing;
+	//canvasLive.onmouseup = stopDrawing;
+	//window.onmouseup = stopDrawing;
 	//canvasLive.onmouseout = stopDrawing;
-	canvasLive.onmousemove = draw;
+	//canvasLive.onmousemove = draw;
 	//***********************************************************
 
 
-    $('#customDataFormat').hide('slow');
+    //$('#customDataFormat').hide('slow');
     hideAllShowOne("");//#interpolationDiv
+
+	//canvasLive >>> canvasScope
+	//contextLive >>> contextLiveScope
+    canvasScope = document.getElementById("summaryGlassForGraphic");    
+	contextLiveScope = canvasScope.getContext("2d");
+
+	// Подключаем требуемые для рисования события
+	canvasScope.onmousedown = startScopeDrawing;
+	canvasScope.onmouseup = stopScopeDrawing;
+	window.onmouseup = stopScopeDrawing;
+	canvasScope.onmousemove = drawScope;
 };
 
 var isDrawing = false;
+var isScopeDrawing = false;
+
 function startDrawing(e) {
 	// Начинаем рисовать
 	isDrawing = true;
@@ -882,6 +813,20 @@ function startDrawing(e) {
 	firstCanvasY = e.pageY - canvasLive.offsetTop;
 	////context2.lineWidth = 5;
 }
+function startScopeDrawing(e) {
+	// Начинаем рисовать
+	isScopeDrawing = true;
+
+	// Создаем новый путь (с текущим цветом и толщиной линии)
+	////context2.beginPath();
+	//context.beginPath();
+
+	// Нажатием левой кнопки мыши помещаем "кисть" на холст
+	////context2.moveTo(e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop);
+	firstScopeCanvasX = e.pageX - canvasScope.offsetLeft;
+	firstScopeCanvasY = e.pageY - canvasScope.offsetTop;
+	////context2.lineWidth = 5;
+}
 function draw(e) {
 	if (isDrawing == true)
 	{
@@ -893,6 +838,38 @@ function draw(e) {
 		contextLive.fillRect(firstCanvasX, firstCanvasY, (x-firstCanvasX), (y-firstCanvasY) );
 
 
+	}
+}
+function drawScope(e) {
+	if (isScopeDrawing == true)
+	{
+		let oneDrowStart = performance.now();
+		// Определяем текущие координаты указателя мыши
+		var x = e.pageX - canvasScope.offsetLeft;
+		var y = e.pageY - canvasScope.offsetTop;
+		contextLiveScope.fillStyle = "grey";
+		contextLiveScope.fillRect(0,0, canvasScope.width, canvasScope.height);
+		//debugger;
+		//contextLiveScope.clearRect(firstScopeCanvasX, firstScopeCanvasY, (x-firstScopeCanvasX), (y-firstScopeCanvasY) );
+		contextLiveScope.clearRect(firstScopeCanvasX, 0+canvasScope.height/20, (x-firstScopeCanvasX), canvasScope.height-canvasScope.height/10 );
+
+		secondScopeCanvasX = e.pageX - canvasScope.offsetLeft;
+		secondScopeCanvasY = e.pageY - canvasScope.offsetTop;
+		
+		document.getElementById('leftX').value = allLeftX + ( firstScopeCanvasX < secondScopeCanvasX ? firstScopeCanvasX : secondScopeCanvasX ) / canvasScope.width * (allRightX - allLeftX);
+		document.getElementById('rightX').value = allLeftX + ( firstScopeCanvasX > secondScopeCanvasX ? firstScopeCanvasX : secondScopeCanvasX ) / canvasScope.width * (allRightX - allLeftX);
+
+		//document.getElementById('minY').value = currentMin + ((canvasLive.height- ( firstCanvasY > secondCanvasY ? firstCanvasY : secondCanvasY )) / canvasLive.height ) * (currentMax - currentMin);
+		//document.getElementById('maxY').value = currentMin + ((canvasLive.height- ( firstCanvasY < secondCanvasY ? firstCanvasY : secondCanvasY )) / canvasLive.height ) * (currentMax - currentMin);
+
+		showRectangle(
+			+document.getElementById('maxY').value,
+			+document.getElementById('minY').value,
+			+document.getElementById('leftX').value,
+			+document.getElementById('rightX').value
+		)
+		let oneDrowEnd = performance.now();
+		console.log("one drow " + (oneDrowEnd-oneDrowStart) );
 	}
 }
 function stopDrawing(e) {
@@ -916,6 +893,30 @@ function stopDrawing(e) {
 		)
 	}
 	isDrawing = false;
+}
+function stopScopeDrawing(e) {
+
+	//I added it
+	if (isScopeDrawing) {
+		//canvasLive >>> canvasScope
+		//contextLive >>> contextLiveScope
+		secondScopeCanvasX = e.pageX - canvasScope.offsetLeft;
+		secondScopeCanvasY = e.pageY - canvasScope.offsetTop;
+		
+		document.getElementById('leftX').value = allLeftX + ( firstScopeCanvasX < secondScopeCanvasX ? firstScopeCanvasX : secondScopeCanvasX ) / canvasScope.width * (allRightX - allLeftX);
+		document.getElementById('rightX').value = allLeftX + ( firstScopeCanvasX > secondScopeCanvasX ? firstScopeCanvasX : secondScopeCanvasX ) / canvasScope.width * (allRightX - allLeftX);
+
+		//document.getElementById('minY').value = currentMin + ((canvasLive.height- ( firstCanvasY > secondCanvasY ? firstCanvasY : secondCanvasY )) / canvasLive.height ) * (currentMax - currentMin);
+		//document.getElementById('maxY').value = currentMin + ((canvasLive.height- ( firstCanvasY < secondCanvasY ? firstCanvasY : secondCanvasY )) / canvasLive.height ) * (currentMax - currentMin);
+
+		showRectangle(
+			+document.getElementById('maxY').value,
+			+document.getElementById('minY').value,
+			+document.getElementById('leftX').value,
+			+document.getElementById('rightX').value
+		)
+	}
+	isScopeDrawing = false;
 }
 
 function hideShowDiv(divId){

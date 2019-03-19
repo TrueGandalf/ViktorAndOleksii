@@ -121,11 +121,11 @@
         border-width: 1px;
         /*border-style: groove;*/
     }
-    #glassForGraphic{
+    #glassForGraphic, #summaryGlassForGraphic{
         opacity: 0.3;
         z-index: 1;
     }
-    /**/#graphic{
+    /**/#graphic, #summaryGraphic{
 
         position: absolute;
         /*opacity: 0.5;*/
