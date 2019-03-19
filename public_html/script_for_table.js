@@ -783,8 +783,8 @@ window.onload = function() {
 	window.onmouseup = stopScopeDrawing;
 	canvasScope.onmousemove = drawScope;
 	setFullScreen();
-	buildGraphic();
 };
+window.addEventListener('resize', setFullScreen, false);
 
 var isDrawing = false;
 var isScopeDrawing = false;
@@ -963,4 +963,5 @@ function setFullScreen() {
 	document.getElementById("glassForGraphic").width = window.innerWidth - 50;
 	document.getElementById("summaryGraphic").width = window.innerWidth - 50;
 	document.getElementById("summaryGlassForGraphic").width = window.innerWidth - 50;
+	buildGraphic();
 }
