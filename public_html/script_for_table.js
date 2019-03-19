@@ -782,6 +782,7 @@ window.onload = function() {
 	canvasScope.onmouseup = stopScopeDrawing;
 	window.onmouseup = stopScopeDrawing;
 	canvasScope.onmousemove = drawScope;
+	setFullScreen();
 	buildGraphic();
 };
 
@@ -956,4 +957,10 @@ function copyCommaText(id) {
 function putCommaText(id) {
     document.getElementById(id).value = commaText;
     alert("Исходный текст с запятыми восстановлен.");
+}
+function setFullScreen() {
+	document.getElementById("graphic").width = window.innerWidth - 50;
+	document.getElementById("glassForGraphic").width = window.innerWidth - 50;
+	document.getElementById("summaryGraphic").width = window.innerWidth - 50;
+	document.getElementById("summaryGlassForGraphic").width = window.innerWidth - 50;
 }
