@@ -277,7 +277,6 @@ function calcXNewEnd() {
 	}
 }
 */
-
 function interpolation() {
 	//arrayY
 	//arrayX
@@ -783,6 +782,7 @@ window.onload = function() {
 	canvasScope.onmouseup = stopScopeDrawing;
 	window.onmouseup = stopScopeDrawing;
 	canvasScope.onmousemove = drawScope;
+	buildGraphic();
 };
 
 var isDrawing = false;
