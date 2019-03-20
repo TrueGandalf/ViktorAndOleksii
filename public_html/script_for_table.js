@@ -757,78 +757,63 @@ var firstScopeCanvasX, firstScopeCanvasY,
 	secondScopeCanvasX, secondScopeCanvasY;
 
 window.onload = function() {
-	//canvasLive = document.getElementById("glassForGraphic");
-	//contextLive = canvasLive.getContext("2d");
-
-	// Подключаем требуемые для рисования события
-	//canvasLive.onmousedown = startDrawing;
-	//canvasLive.onmouseup = stopDrawing;
-	//window.onmouseup = stopDrawing;
-	//canvasLive.onmouseout = stopDrawing;
-	//canvasLive.onmousemove = draw;
-	//***********************************************************
-
-
-    //$('#customDataFormat').hide('slow');
-    hideAllShowOne("");//#interpolationDiv
-
-	//canvasLive >>> canvasScope
-	//contextLive >>> contextLiveScope
     canvasScope = document.getElementById("summaryGlassForGraphic");    
 	contextLiveScope = canvasScope.getContext("2d");
 
 	// Подключаем требуемые для рисования события
 	canvasScope.onmousedown = startScopeDrawing;
 	canvasScope.onmouseup = stopScopeDrawing;
+	
+	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	window.onmouseup = stopScopeDrawing;
+
+	//window.ontouchend = stopScopeDrawing;
 	canvasScope.onmousemove = drawScope;
+	//canvasScope.ontouchmove = drawScope;
 	setFullScreen();
+
+	// Set up touch events for mobile
+	canvasScope.addEventListener("touchstart", function (e) {
+	        mousePos = getTouchPos(canvasScope, e);
+	  var touch = e.touches[0];
+	  var mouseEvent = new MouseEvent("mousedown", {
+	    clientX: touch.clientX,
+	    clientY: touch.clientY
+	  });
+	  canvasScope.dispatchEvent(mouseEvent);
+	}, false);
+	canvasScope.addEventListener("touchend", function (e) {
+	  var mouseEvent = new MouseEvent("mouseup", {});
+	  canvasScope.dispatchEvent(mouseEvent);
+	}, false);
+	canvasScope.addEventListener("touchmove", function (e) {
+	  var touch = e.touches[0];
+	  var mouseEvent = new MouseEvent("mousemove", {
+	    clientX: touch.clientX,
+	    clientY: touch.clientY
+	  });
+	  canvasScope.dispatchEvent(mouseEvent);
+	}, false);
+
+		// Get the position of a touch relative to the canvas
+	function getTouchPos(canvasDom, touchEvent) {
+	  var rect = canvasDom.getBoundingClientRect();
+	  return {
+	    x: touchEvent.touches[0].clientX - rect.left,
+	    y: touchEvent.touches[0].clientY - rect.top
+	  };
+	}
 };
 window.addEventListener('resize', setFullScreen, false);
 
-var isDrawing = false;
 var isScopeDrawing = false;
-
-function startDrawing(e) {
-	// Начинаем рисовать
-	isDrawing = true;
-
-	// Создаем новый путь (с текущим цветом и толщиной линии)
-	////context2.beginPath();
-	//context.beginPath();
-
-	// Нажатием левой кнопки мыши помещаем "кисть" на холст
-	////context2.moveTo(e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop);
-	firstCanvasX = e.pageX - canvasLive.offsetLeft;
-	firstCanvasY = e.pageY - canvasLive.offsetTop;
-	////context2.lineWidth = 5;
-}
 function startScopeDrawing(e) {
 	// Начинаем рисовать
 	isScopeDrawing = true;
 
-	// Создаем новый путь (с текущим цветом и толщиной линии)
-	////context2.beginPath();
-	//context.beginPath();
-
 	// Нажатием левой кнопки мыши помещаем "кисть" на холст
-	////context2.moveTo(e.pageX - canvas.offsetLeft, e.pageY - canvas.offsetTop);
 	firstScopeCanvasX = e.pageX - canvasScope.offsetLeft;
 	firstScopeCanvasY = e.pageY - canvasScope.offsetTop;
-	////context2.lineWidth = 5;
-}
-function draw(e) {
-	if (isDrawing == true)
-	{
-		// Определяем текущие координаты указателя мыши
-		var x = e.pageX - canvasLive.offsetLeft;
-		var y = e.pageY - canvasLive.offsetTop;
-		contextLive.fillStyle = "green";
-		contextLive.clearRect(0,0, canvasLive.width, canvasLive.height);
-		contextLive.fillRect(firstCanvasX, firstCanvasY, (x-firstCanvasX), (y-firstCanvasY) );
-
-
-	}
 }
 function drawScope(e) {
 	if (isScopeDrawing == true)
@@ -839,8 +824,6 @@ function drawScope(e) {
 		var y = e.pageY - canvasScope.offsetTop;
 		contextLiveScope.fillStyle = "grey";
 		contextLiveScope.fillRect(0,0, canvasScope.width, canvasScope.height);
-		//debugger;
-		//contextLiveScope.clearRect(firstScopeCanvasX, firstScopeCanvasY, (x-firstScopeCanvasX), (y-firstScopeCanvasY) );
 		contextLiveScope.clearRect(firstScopeCanvasX, 0+canvasScope.height/20, (x-firstScopeCanvasX), canvasScope.height-canvasScope.height/10 );
 
 		secondScopeCanvasX = e.pageX - canvasScope.offsetLeft;
@@ -848,9 +831,6 @@ function drawScope(e) {
 		
 		leftXvalue = allLeftX + ( firstScopeCanvasX < secondScopeCanvasX ? firstScopeCanvasX : secondScopeCanvasX ) / canvasScope.width * (allRightX - allLeftX);
 		rightXvalue = allLeftX + ( firstScopeCanvasX > secondScopeCanvasX ? firstScopeCanvasX : secondScopeCanvasX ) / canvasScope.width * (allRightX - allLeftX);
-
-		//minYvalue = currentMin + ((canvasLive.height- ( firstCanvasY > secondCanvasY ? firstCanvasY : secondCanvasY )) / canvasLive.height ) * (currentMax - currentMin);
-		//maxYvalue = currentMin + ((canvasLive.height- ( firstCanvasY < secondCanvasY ? firstCanvasY : secondCanvasY )) / canvasLive.height ) * (currentMax - currentMin);
 
 		showRectangle(
 			maxYvalue,
@@ -864,7 +844,6 @@ function drawScope(e) {
 }
 function stopDrawing(e) {
 
-	//I added it
 	if (isDrawing) {
 
 		secondCanvasX = e.pageX - canvasLive.offsetLeft;
@@ -885,27 +864,6 @@ function stopDrawing(e) {
 	isDrawing = false;
 }
 function stopScopeDrawing(e) {
-
-	//I added it
-	if (isScopeDrawing) {
-		//canvasLive >>> canvasScope
-		//contextLive >>> contextLiveScope
-		secondScopeCanvasX = e.pageX - canvasScope.offsetLeft;
-		secondScopeCanvasY = e.pageY - canvasScope.offsetTop;
-		
-		leftXvalue = allLeftX + ( firstScopeCanvasX < secondScopeCanvasX ? firstScopeCanvasX : secondScopeCanvasX ) / canvasScope.width * (allRightX - allLeftX);
-		rightXvalue = allLeftX + ( firstScopeCanvasX > secondScopeCanvasX ? firstScopeCanvasX : secondScopeCanvasX ) / canvasScope.width * (allRightX - allLeftX);
-
-		//minYvalue = currentMin + ((canvasLive.height- ( firstCanvasY > secondCanvasY ? firstCanvasY : secondCanvasY )) / canvasLive.height ) * (currentMax - currentMin);
-		//maxYvalue = currentMin + ((canvasLive.height- ( firstCanvasY < secondCanvasY ? firstCanvasY : secondCanvasY )) / canvasLive.height ) * (currentMax - currentMin);
-
-		showRectangle(
-			maxYvalue,
-			minYvalue,
-			leftXvalue,
-			rightXvalue
-		)
-	}
 	isScopeDrawing = false;
 }
 function hideShowDiv(divId){
