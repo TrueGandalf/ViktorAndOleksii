@@ -1,10 +1,9 @@
-
-
 var arrayX = [];
 var arrayY = [];
 var ordinatArrays = [];
 var currentLeftX, currentRightX, currentMax, currentMin;
 var allLeftX, allRightX;
+var leftXvalue, rightXvalue, minYvalue, maxYvalue;
 function buildGraphic() {
 	let timeStart = performance.now();
 	graphNum = 0;//4
@@ -32,6 +31,7 @@ function buildGraphic() {
 	let timeEnd =  performance.now();
 	console.log("Time " + (timeEnd - timeStart));
 }
+/*
 function buildCustomGraphic(whetherXToMarker, contentXTo, whetherYAfterMarker, contentYAfter,
                             whetherYToMarker, contentYTo, whetherXAfterMarker, contentXAfter) {
     var currentSymbol = 0;
@@ -76,12 +76,10 @@ function buildCustomGraphic(whetherXToMarker, contentXTo, whetherYAfterMarker, c
 
     }
 
-}
+}*/
 function showGraphic(max, min, leftX, rightX, currentArrayY, divId) {
 	let showGraphicStart = performance.now();
 	document.getElementById(divId).width = document.getElementById(divId).width;// redraw canvas
-
-
 
 	var graphic_canvas = document.getElementById(divId);
 	var graphic_context = graphic_canvas.getContext("2d");
@@ -264,6 +262,7 @@ function drawGraphic(graphic_context, graphic_height, graphic_width, leftX, hori
 	graphic_context.beginPath();
 }
 var xNewInterpolation ={};
+/*
 function calcXNewEnd() {
 	var start = +document.getElementById("xNewStart").value;
 	var step = +document.getElementById("xNewStep").value;
@@ -277,7 +276,7 @@ function calcXNewEnd() {
 		end : end
 	}
 }
-
+*/
 function interpolation() {
 	//arrayY
 	//arrayX
@@ -329,7 +328,7 @@ function interpolation() {
 	document.getElementById("textareaYNewArray").innerHTML = arrayYNew.toString().replace(/,/g, "\n");
 }
 function getMinimumValue() {
-debugger;
+	debugger;
 	var xLeft  = +document.getElementById("xLeftMinimumValue").value;
 	var xRight = +document.getElementById("xRightMinimumValue").value;
 	var indexXLeft, indexXRight;
@@ -515,7 +514,6 @@ function getSteepnessValue() {
 	var result = +x10/ +x50;
 	document.getElementById("xSteepnessValueOutput").innerHTML = "y<sub>10%</sub>/y<sub>50%</sub> = " + result;
 	return result;
-
 }
 function getAverage() {
 
@@ -558,14 +556,13 @@ function changeGraphicVerticalDiapason(max, min, leftX, rightX) {
 	showGraphic(max, min, leftX, rightX);
 }
 function changeGraphicVerticalDiapasonChangeable() {
-	max =  document.getElementById('maxY').value;
+	max =  maxYvalue;
 	showGraphic(max, 0, 0);
 }
 function changeCaption() {
 
 		document.getElementById("yCaption").innerHTML = document.getElementById("yChangeCaption").value;
 		document.getElementById("xCaption").innerHTML = document.getElementById("xChangeCaption").value;
-
 }
 function changeLeftRightX(max, min, leftX, rightX) {
 
@@ -606,9 +603,9 @@ function showRectangle(max, min, leftX, rightX) {
 			reverseMultiplier *= 10;
 		}
 		max = Math.ceil(max / reverseMultiplier * 10) * reverseMultiplier / 10;
-		document.getElementById('maxY').value = max;
+		maxYvalue = max;
 		min = Math.floor(min / reverseMultiplier * 10) * reverseMultiplier / 10;
-		document.getElementById('minY').value = min;
+		minYvalue = min;
 
 		///////////////////////////////////////////////////////
 		//Improve Edges X//////////////////////////////////////
@@ -629,9 +626,9 @@ function showRectangle(max, min, leftX, rightX) {
 			reverseMultiplier *= 10;
 		}
 		rightX = Math.ceil(rightX / reverseMultiplier * 10) * reverseMultiplier / 10;
-		document.getElementById('rightX').value = rightX;
+		rightXvalue = rightX;
 		leftX = Math.floor(leftX / reverseMultiplier * 10) * reverseMultiplier / 10;
-		document.getElementById('leftX').value = leftX;
+		leftXvalue = leftX;
 
 		///////////////////////////////////////////////////////
 	}
@@ -686,11 +683,9 @@ function showRectangle(max, min, leftX, rightX) {
 	param1-paramN - передаваемые параметры.
 	*/
 
-	setTimeout( changeLeftRightX, 0, +document.getElementById('maxY').value,
-		+document.getElementById('minY').value, +document.getElementById('leftX').value, +document.getElementById('rightX').value);
+	setTimeout( changeLeftRightX, 0, maxYvalue,
+		minYvalue, leftXvalue, rightXvalue);
 	setTimeout(redraw, 0);
-
-
 }
 function blackLinesQuantity(axisMaxValue) {
 	axisMaxValue = +axisMaxValue;
@@ -712,7 +707,6 @@ function greykLinesQuantity(blackLines) {
 	if (blackLines>=1) return 10;
 	return;
 }
-
 function yBlackLinesStep(axisMaxValue) {
 	axisMaxValue = +axisMaxValue;
 	var multiplier = 1;
@@ -735,7 +729,6 @@ function yBlackLinesStep(axisMaxValue) {
 
 	return 1/(multiplier);
 }
-
 function precision(num) {
 
 	var result = 0;
@@ -749,15 +742,10 @@ function precision(num) {
 	}
 	return result;
 }
-function redraw() {document.getElementById("glassForGraphic").width = document.getElementById("glassForGraphic").width;}
-
-
-function download() {
-	var canvas = document.getElementById("graphic");
-	window.open(canvas.toDataURL("image/png"), "mywindow");
+function redraw() {
+	document.getElementById("glassForGraphic").width = document.getElementById("glassForGraphic").width;
 }
 
-/////////////////////////////////////////////////////////////////////////
 var canvasLive;
 var contextLive;
 var firstCanvasX, firstCanvasY,
@@ -794,7 +782,9 @@ window.onload = function() {
 	canvasScope.onmouseup = stopScopeDrawing;
 	window.onmouseup = stopScopeDrawing;
 	canvasScope.onmousemove = drawScope;
+	setFullScreen();
 };
+window.addEventListener('resize', setFullScreen, false);
 
 var isDrawing = false;
 var isScopeDrawing = false;
@@ -856,17 +846,17 @@ function drawScope(e) {
 		secondScopeCanvasX = e.pageX - canvasScope.offsetLeft;
 		secondScopeCanvasY = e.pageY - canvasScope.offsetTop;
 		
-		document.getElementById('leftX').value = allLeftX + ( firstScopeCanvasX < secondScopeCanvasX ? firstScopeCanvasX : secondScopeCanvasX ) / canvasScope.width * (allRightX - allLeftX);
-		document.getElementById('rightX').value = allLeftX + ( firstScopeCanvasX > secondScopeCanvasX ? firstScopeCanvasX : secondScopeCanvasX ) / canvasScope.width * (allRightX - allLeftX);
+		leftXvalue = allLeftX + ( firstScopeCanvasX < secondScopeCanvasX ? firstScopeCanvasX : secondScopeCanvasX ) / canvasScope.width * (allRightX - allLeftX);
+		rightXvalue = allLeftX + ( firstScopeCanvasX > secondScopeCanvasX ? firstScopeCanvasX : secondScopeCanvasX ) / canvasScope.width * (allRightX - allLeftX);
 
-		//document.getElementById('minY').value = currentMin + ((canvasLive.height- ( firstCanvasY > secondCanvasY ? firstCanvasY : secondCanvasY )) / canvasLive.height ) * (currentMax - currentMin);
-		//document.getElementById('maxY').value = currentMin + ((canvasLive.height- ( firstCanvasY < secondCanvasY ? firstCanvasY : secondCanvasY )) / canvasLive.height ) * (currentMax - currentMin);
+		//minYvalue = currentMin + ((canvasLive.height- ( firstCanvasY > secondCanvasY ? firstCanvasY : secondCanvasY )) / canvasLive.height ) * (currentMax - currentMin);
+		//maxYvalue = currentMin + ((canvasLive.height- ( firstCanvasY < secondCanvasY ? firstCanvasY : secondCanvasY )) / canvasLive.height ) * (currentMax - currentMin);
 
 		showRectangle(
-			+document.getElementById('maxY').value,
-			+document.getElementById('minY').value,
-			+document.getElementById('leftX').value,
-			+document.getElementById('rightX').value
+			maxYvalue,
+			minYvalue,
+			leftXvalue,
+			rightXvalue
 		)
 		let oneDrowEnd = performance.now();
 		console.log("one drow " + (oneDrowEnd-oneDrowStart) );
@@ -879,17 +869,17 @@ function stopDrawing(e) {
 
 		secondCanvasX = e.pageX - canvasLive.offsetLeft;
 		secondCanvasY = e.pageY - canvasLive.offsetTop;
-		document.getElementById('leftX').value = currentLeftX + ( firstCanvasX < secondCanvasX ? firstCanvasX : secondCanvasX ) / canvasLive.width * (currentRightX - currentLeftX);
-		document.getElementById('rightX').value = currentLeftX + ( firstCanvasX > secondCanvasX ? firstCanvasX : secondCanvasX ) / canvasLive.width * (currentRightX - currentLeftX);
+		leftXvalue = currentLeftX + ( firstCanvasX < secondCanvasX ? firstCanvasX : secondCanvasX ) / canvasLive.width * (currentRightX - currentLeftX);
+		rightXvalue = currentLeftX + ( firstCanvasX > secondCanvasX ? firstCanvasX : secondCanvasX ) / canvasLive.width * (currentRightX - currentLeftX);
 
-		document.getElementById('minY').value = currentMin + ((canvasLive.height- ( firstCanvasY > secondCanvasY ? firstCanvasY : secondCanvasY )) / canvasLive.height ) * (currentMax - currentMin);
-		document.getElementById('maxY').value = currentMin + ((canvasLive.height- ( firstCanvasY < secondCanvasY ? firstCanvasY : secondCanvasY )) / canvasLive.height ) * (currentMax - currentMin);
+		minYvalue = currentMin + ((canvasLive.height- ( firstCanvasY > secondCanvasY ? firstCanvasY : secondCanvasY )) / canvasLive.height ) * (currentMax - currentMin);
+		maxYvalue = currentMin + ((canvasLive.height- ( firstCanvasY < secondCanvasY ? firstCanvasY : secondCanvasY )) / canvasLive.height ) * (currentMax - currentMin);
 
 		showRectangle(
-			+document.getElementById('maxY').value,
-			+document.getElementById('minY').value,
-			+document.getElementById('leftX').value,
-			+document.getElementById('rightX').value
+			maxYvalue,
+			minYvalue,
+			leftXvalue,
+			rightXvalue
 		)
 	}
 	isDrawing = false;
@@ -903,22 +893,21 @@ function stopScopeDrawing(e) {
 		secondScopeCanvasX = e.pageX - canvasScope.offsetLeft;
 		secondScopeCanvasY = e.pageY - canvasScope.offsetTop;
 		
-		document.getElementById('leftX').value = allLeftX + ( firstScopeCanvasX < secondScopeCanvasX ? firstScopeCanvasX : secondScopeCanvasX ) / canvasScope.width * (allRightX - allLeftX);
-		document.getElementById('rightX').value = allLeftX + ( firstScopeCanvasX > secondScopeCanvasX ? firstScopeCanvasX : secondScopeCanvasX ) / canvasScope.width * (allRightX - allLeftX);
+		leftXvalue = allLeftX + ( firstScopeCanvasX < secondScopeCanvasX ? firstScopeCanvasX : secondScopeCanvasX ) / canvasScope.width * (allRightX - allLeftX);
+		rightXvalue = allLeftX + ( firstScopeCanvasX > secondScopeCanvasX ? firstScopeCanvasX : secondScopeCanvasX ) / canvasScope.width * (allRightX - allLeftX);
 
-		//document.getElementById('minY').value = currentMin + ((canvasLive.height- ( firstCanvasY > secondCanvasY ? firstCanvasY : secondCanvasY )) / canvasLive.height ) * (currentMax - currentMin);
-		//document.getElementById('maxY').value = currentMin + ((canvasLive.height- ( firstCanvasY < secondCanvasY ? firstCanvasY : secondCanvasY )) / canvasLive.height ) * (currentMax - currentMin);
+		//minYvalue = currentMin + ((canvasLive.height- ( firstCanvasY > secondCanvasY ? firstCanvasY : secondCanvasY )) / canvasLive.height ) * (currentMax - currentMin);
+		//maxYvalue = currentMin + ((canvasLive.height- ( firstCanvasY < secondCanvasY ? firstCanvasY : secondCanvasY )) / canvasLive.height ) * (currentMax - currentMin);
 
 		showRectangle(
-			+document.getElementById('maxY').value,
-			+document.getElementById('minY').value,
-			+document.getElementById('leftX').value,
-			+document.getElementById('rightX').value
+			maxYvalue,
+			minYvalue,
+			leftXvalue,
+			rightXvalue
 		)
 	}
 	isScopeDrawing = false;
 }
-
 function hideShowDiv(divId){
 
     $(divId).toggle('slow');
@@ -968,5 +957,11 @@ function copyCommaText(id) {
 function putCommaText(id) {
     document.getElementById(id).value = commaText;
     alert("Исходный текст с запятыми восстановлен.");
-
+}
+function setFullScreen() {
+	document.getElementById("graphic").width = window.innerWidth - 50;
+	document.getElementById("glassForGraphic").width = window.innerWidth - 50;
+	document.getElementById("summaryGraphic").width = window.innerWidth - 50;
+	document.getElementById("summaryGlassForGraphic").width = window.innerWidth - 50;
+	buildGraphic();
 }

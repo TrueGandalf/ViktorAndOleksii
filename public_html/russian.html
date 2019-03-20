@@ -2,7 +2,7 @@
 <head>
 	<meta charset='utf-8'>
 	<title>Telegram Contest</title>
-	<link rel="icon" type="image/ico" href="favicon.ico" />
+	<link rel="icon" type="image/png" href="favicon.png" />
     <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 	<script src="chart_data_data_js.js"></script>
 	<script src='script_for_table.js'></script>
@@ -20,218 +20,16 @@
 </head>
 <body>
 <div id="container">
-	<div class="middle">
-		
-		<br><button onclick="buildGraphic()">Вперед!</button><br><!--buildGraphic-->
-        <div id="parsingResults"></div>
-
-		<div id="result">
-
-			<div id = 'leftOfTheGraphic'>
-				<h2>Примеры:</h2>
-				<span class="sample">T, %</span>
-				<span class="sample">R, %</span>
-				<span class="sample">λ, nm</span>
-				<span class="sample">λ, µm</span>
-				<!--<span class="sample">∠</span>-->
-				<span class="sample">∠</span>
-				<span class="sample">°</span>
-				<span class="sample">º</span>
-				<span class="sample">A<sub>b</sub><sup>c</sup> = A&lt;sub&gt;b&lt;/sub&gt;&lt;sup&gt;c&lt;/sup&gt;</span>
-
-			</div>
-			<div id = 'rightOfTheGraphic'>
-				<h2>Ссылки:</h2>
-				<span class="sample, leftText"><a href="https://ru.wikipedia.org/wiki/%D0%94%D0%B8%D0%B0%D0%B3%D1%80%D0%B0%D0%BC%D0%BC%D0%B0">Диагра́мма (греч. Διάγραμμα (diagramma) — изображение, рисунок, чертёж) — графическое представление данных линейными отрезками или геометрическими фигурами, позволяющее быстро оценить соотношение нескольких величин. Представляет собой геометрическое символьное изображение информации с применением различных приёмов техники визуализации.</a></span>
-
-
-			</div>
-			<div id="forGraphic">
-				<div id="forGraphic2">
-					<div class="right" >
-						<div style=" float:right;">
-							y<sub>max</sub> =
-							<input type="text" id="maxY" size="4" value=""><br>
-							<!--<button onclick="changeGraphicVerticalDiapasonChangeable()">Change y<sub>max</sub></button><br>-->
-							<!--<button onclick="changeLeftRightX( +document.getElementById('maxY').value,  +document.getElementById('minY').value, +document.getElementById('leftX').value, +document.getElementById('rightX').value)">Change y<sub>max</sub></button><br>
-							-->
-							До x =&nbsp;<input type="text" id="rightX" size="4" value=""> <br>
-						</div>
-						<div style="float:right;">
-							y<sub>min</sub> =
-							<input type="text" id="minY" size="4" value=""> <!--&nbsp;&nbsp-->
-							<br>
-							От x =&nbsp;<input type="text" id="leftX" size="4" value="">
-							<sub></sub>
-						</div>
-						<div class="endDiv"></div>
-						<div style="text-align: center;">
-							<button onclick="
-							showRectangle(
-								+document.getElementById('maxY'  ).value,
-								+document.getElementById('minY'  ).value,
-								+document.getElementById('leftX' ).value,
-								+document.getElementById('rightX').value
-								)
-								">Изменить границы</button>
-						</div>
-
-					</div>
-
-					<!--
-					<button onclick="changeGraphicVerticalDiapason(104)">y = 100%</button>
-					<button onclick="changeGraphicVerticalDiapason(0)">y = max</button><br>
-
-					<button onclick="changeYCaption('T')">T, %</button>
-					<button onclick="changeYCaption('R')">R, %</button><br><br>
-					-->
-					<br>
-					Подпись Y: <input type="text" id="yChangeCaption" size="30" value="T, %"  oninput="changeCaption()"><br>
-					Подпись X: <input type="text" id="xChangeCaption" size="30" value="λ, nm" oninput="changeCaption()"><br>
-					<br>
-
-					<span id="yCaption">T, %</span><br>
-
-					<canvas id="graphic"         width="1000" height="500"></canvas>
-					<canvas id="glassForGraphic" width="1000" height="500"></canvas>
-					</br>
-					<div>
-						<canvas id="summaryGraphic"         width="1000" height="100"></canvas>
-						<canvas id="summaryGlassForGraphic" width="1000" height="100"></canvas>						
-					</div>
-
-					<div class="rightText">
-						<span id="xCaption">λ, nm</span>
-					</div>
-					<br>
-				</div>
-				<!--<div style="display: inline-block;" class="endDiv">11111</div> 222222 -->
-				<button onclick="download()">Сохранить изображение</button>
-
-			</div>
+	<div id="forGraphic">
+		<canvas id="graphic" width="1000" height="500"></canvas>
+		<canvas id="glassForGraphic" width="1000" height="500"></canvas>
+		</br>
+		<div>
+			<canvas id="summaryGraphic" width="1000" height="100"></canvas>
+			<canvas id="summaryGlassForGraphic" width="1000" height="100"></canvas>						
 		</div>
-		<div id="extraApplications">
-			<div id="interpolation" class="extraApplication">
-                <input type="button" id="show1" value="Интерполяция" onclick="hideAllShowOne('#interpolationDiv')">
-				<div id="interpolationDiv">
-                    x<sub>новый<sub>первый</sub></sub> =
-                    <input type="text" id="xNewStart" size="4" value=""><br>
-                    x<sub>новый<sub>шаг</sub></sub> =
-                    <input type="text" id="xNewStep" size="4" value=""><br>
-                    шагов =
-                    <input type="text" id="xNewSteps" size="4" value=""><br>
-                    <button onclick="calcXNewEnd()">Посчитать</button>
-                    <span id="xNewEnd">x<sub>новый<sub>последний</sub></sub> = </span>
-                    <br>
-                    <br>
-
-                    <br>
-                    X&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                    &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbspY
-                    <br>
-
-                    <textarea id="textareaXNewArray"></textarea>
-                    <textarea id="textareaYNewArray"></textarea>
-				</div>
-
-			</div>
-			<div id="" class="extraApplication">
-                <input type="button" id="show2" value="Наименьшее значение" onclick="hideAllShowOne('#theLittlestDiv')">
-                <div id="theLittlestDiv">
-                    x<sub>от</sub> =
-                    <input type="text" id="xLeftMinimumValue" size="4" value=""> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                    x<sub>до</sub> =
-                    <input type="text" id="xRightMinimumValue" size="4" value=""><br>
-                    <button onclick="getMinimumValue()">Узнать минимум</button><br>
-                    <span id="minimumValue">y<sub>min</sub> = </span>
-                </div>
-
-
-			</div>
-			<div id="" class="extraApplication">
-                <input type="button" id="show3" value="Наибольшое значение" onclick="hideAllShowOne('#theBiggestDiv')">
-
-				<div id="theBiggestDiv">
-                    x<sub>от</sub> =
-                    <input type="text" id="xLeftMaximumValue" size="4" value=""> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                    x<sub>до</sub> =
-                    <input type="text" id="xRightMaximumValue" size="4" value=""><br>
-                    <button onclick="getMaximumValue()">Узнать максимум</button><br>
-                    <span id="maximumValue">y<sub>max</sub> = </span>
-				</div>
-			</div>
-			<div id="" class="extraApplication">
-				<!--<h3 style="margin: 5 0 0 0">Точное значние Y при x</h3>-->
-                <input type="button" id="show4" value="Точное значние Y при x" onclick="hideAllShowOne('#yPriXDiv')">
-                <div id="yPriXDiv">
-
-                    <h4 style="margin: 0">(интерполированное)</h4>
-                    x<sub>точное</sub> =
-                    <input type="text" id="xExactValueInput" size="4" value=""> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                    <button onclick="getYExactValue()">Узнать значение</button><br>
-                    <span id="yExactValueOutput">y<sub>точное</sub> = </span><br>
-
-                </div>
-			</div>
-			<div id="yFromX" class="extraApplication">
-				<!--<h3 style="margin: 5 0 0 0">Точное значение X при y</h3>-->
-                <input type="button" id="show5" value="Точное значение X при y" onclick="hideAllShowOne('#xPriYDiv')">
-
-				<div id="xPriYDiv">
-                    <h4 style="margin: 0">(интерполированное)</h4>
-                    x<sub>от</sub> =
-                    <input type="text" id="xLeftExactValueInput" size="4" value=""> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                    x<sub>до</sub> =
-                    <input type="text" id="xRightExactValueInput" size="4" value=""><br>
-                    y<sub>точное</sub> =
-                    <input type="text" id="yExactValueInput" size="4" value=""> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                    <button onclick="getXExactValue()">Узнать значение</button><br>
-                    <span id="xExactValueOutput">x<sub>точное</sub> = </span>
-				</div>
-			</div>
-			<div id="steepness" class="extraApplication">
-                <input type="button" id="show6" value="Крутизна" onclick="hideAllShowOne('#krutiznaDiv')">
-                <div id="krutiznaDiv">
-                    <label>
-                        <input type="radio" name="steepnessRadio" value="1" checked="checked" > 1 &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                    </label>
-                    <label>
-                        <input type="radio" name="steepnessRadio" value="100"                 > 100% &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                        <br>
-                    </label>
-                    x<sub>от</sub> =
-                    <input type="text" id="xLeftSteepnessInput" size="4" value=""> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                    x<sub>до</sub> =
-                    <input type="text" id="xRightSteepnessInput" size="4" value=""><br>
-
-
-                    <button onclick="getSteepnessValue()">Узнать крутизну</button><br>
-                    <span id="x10ValueOutput">x<sub>10%</sub> = </span><br>
-                    <span id="x50ValueOutput">x<sub>50%</sub> = </span><br>
-                    <span id="xSteepnessValueOutput">y<sub>10%</sub>/y<sub>50%</sub> = </span>
-                </div>
-
-			</div>
-			<div id="average" class="extraApplication">
-                <input type="button" id="show7" value="Среднее" onclick="hideAllShowOne('#averageDiv')">
-
-				<div id="averageDiv">
-                    x<sub>от</sub> =
-                    <input type="text" id="xLeftAverage" size="4" value=""> &nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp&nbsp
-                    x<sub>до</sub> =
-                    <input type="text" id="xRightAverage" size="4" value=""><br>
-                    <button onclick="getAverage()">Узнать среднее</button><br>
-                    <span id="averageValue">Среднее = </span>
-				</div>
-
-			</div>
-		</div>
-
-
-			<!--_____________________________________________________________________________________________________________-->
-	</div>
-		<canvas id="void" width="1" height="100"></canvas>
-	<div id="footer"><span color="grey">Сделано Алексеем Жигловым<br>OleksiiZhyglov@gmail.com</span></div>
+	</div>	
+	<canvas id="void" width="1" height="100"></canvas>
 </div>
 
 </body>
