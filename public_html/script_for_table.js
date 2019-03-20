@@ -31,52 +31,6 @@ function buildGraphic() {
 	let timeEnd =  performance.now();
 	console.log("Time " + (timeEnd - timeStart));
 }
-/*
-function buildCustomGraphic(whetherXToMarker, contentXTo, whetherYAfterMarker, contentYAfter,
-                            whetherYToMarker, contentYTo, whetherXAfterMarker, contentXAfter) {
-    var currentSymbol = 0;
-    var start = currentSymbol;//first symbol
-    var end = 0;
-    var textResult = "";
-    var garbageStart = 0;
-
-    while (currentSymbol < document.getElementById("textareaGraphicString").value.length) {
-
-        if (whetherXToMarker) {
-            end = takeToMarker(start, contentXTo);//last symbol
-        } else {
-            end = takeToQuantity(start, contentXTo);//last symbol
-        }
-        textResult += printIt(start, end, "green");//first symbol, last symbol
-        start = end + 1;
-        garbageStart = start;
-
-        if (whetherYAfterMarker) {
-            start = takeAfterMarker(start, contentYAfter);
-        } else {
-            start = takeAfterQuantity(start, contentYAfter);
-        }
-        textResult += printIt(garbageStart, start, "grey");
-
-        if (whetherYToMarker) {
-            end = takeToMarker(start, contentYTo);
-        } else {
-            end = takeToQuantity(start, contentYTo);
-        }
-        textResult += printIt(start, end, "blue");
-        start = end+1;
-        garbageStart = start;
-
-        if (whetherXAfterMarker) {
-            start = takeAfterMarker(start, contentXAfter);
-        } else {
-            start = takeAfterQuantity(start, contentXAfter);
-        }
-        textResult += printIt(start, end, "grey");//first symbol, last symbol
-
-    }
-
-}*/
 function showGraphic(max, min, leftX, rightX, currentArrayY, divId) {
 	let showGraphicStart = performance.now();
 	document.getElementById(divId).width = document.getElementById(divId).width;// redraw canvas
@@ -767,9 +721,7 @@ window.onload = function() {
 	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	window.onmouseup = stopScopeDrawing;
 
-	//window.ontouchend = stopScopeDrawing;
 	canvasScope.onmousemove = drawScope;
-	//canvasScope.ontouchmove = drawScope;
 	setFullScreen();
 
 	// Set up touch events for mobile
@@ -821,12 +773,36 @@ function drawScope(e) {
 		let oneDrowStart = performance.now();
 		// Определяем текущие координаты указателя мыши
 		var x = e.pageX - canvasScope.offsetLeft;
+		/*if (x<0+canvasScope.width/200 || x>canvasScope.width*199/200)
+			return;*/
+		if (x < 0+canvasScope.width/200)
+			x = 0+canvasScope.width/200;
+		if (x > canvasScope.width*199/200)
+			x = canvasScope.width*199/200;
 		var y = e.pageY - canvasScope.offsetTop;
 		contextLiveScope.fillStyle = "grey";
+
 		contextLiveScope.fillRect(0,0, canvasScope.width, canvasScope.height);
-		contextLiveScope.clearRect(firstScopeCanvasX, 0+canvasScope.height/20, (x-firstScopeCanvasX), canvasScope.height-canvasScope.height/10 );
+		contextLiveScope.fillStyle = "#000";
+		let sign = 1;
+		if(x<firstScopeCanvasX)
+			sign = -1;
+		contextLiveScope.fillRect(
+			firstScopeCanvasX-canvasScope.width/200*sign,
+			0,
+			(x-firstScopeCanvasX)+canvasScope.width/100*sign,
+			canvasScope.height);
+		contextLiveScope.clearRect(
+			firstScopeCanvasX,
+			0+canvasScope.height/20,
+			(x-firstScopeCanvasX),
+			canvasScope.height-canvasScope.height/10 );
 
 		secondScopeCanvasX = e.pageX - canvasScope.offsetLeft;
+		if (secondScopeCanvasX < 0+canvasScope.width/200)
+			secondScopeCanvasX = 0+canvasScope.width/200;
+		if (secondScopeCanvasX > canvasScope.width*199/200)
+			secondScopeCanvasX = canvasScope.width*199/200;
 		secondScopeCanvasY = e.pageY - canvasScope.offsetTop;
 		
 		leftXvalue = allLeftX + ( firstScopeCanvasX < secondScopeCanvasX ? firstScopeCanvasX : secondScopeCanvasX ) / canvasScope.width * (allRightX - allLeftX);
@@ -841,27 +817,6 @@ function drawScope(e) {
 		let oneDrowEnd = performance.now();
 		console.log("one drow " + (oneDrowEnd-oneDrowStart) );
 	}
-}
-function stopDrawing(e) {
-
-	if (isDrawing) {
-
-		secondCanvasX = e.pageX - canvasLive.offsetLeft;
-		secondCanvasY = e.pageY - canvasLive.offsetTop;
-		leftXvalue = currentLeftX + ( firstCanvasX < secondCanvasX ? firstCanvasX : secondCanvasX ) / canvasLive.width * (currentRightX - currentLeftX);
-		rightXvalue = currentLeftX + ( firstCanvasX > secondCanvasX ? firstCanvasX : secondCanvasX ) / canvasLive.width * (currentRightX - currentLeftX);
-
-		minYvalue = currentMin + ((canvasLive.height- ( firstCanvasY > secondCanvasY ? firstCanvasY : secondCanvasY )) / canvasLive.height ) * (currentMax - currentMin);
-		maxYvalue = currentMin + ((canvasLive.height- ( firstCanvasY < secondCanvasY ? firstCanvasY : secondCanvasY )) / canvasLive.height ) * (currentMax - currentMin);
-
-		showRectangle(
-			maxYvalue,
-			minYvalue,
-			leftXvalue,
-			rightXvalue
-		)
-	}
-	isDrawing = false;
 }
 function stopScopeDrawing(e) {
 	isScopeDrawing = false;
