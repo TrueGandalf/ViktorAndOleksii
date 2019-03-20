@@ -99,24 +99,24 @@ function drawLines(graphic_context, graphic_height, graphic_width, leftX, horizo
 
 	//vertical lines////////////////////////////////////////////////
 	{
-		graphic_context.moveTo(0, 0);
-		graphic_context.lineTo(0, graphic_height);
-		graphic_context.moveTo(graphic_width, 0);
-		graphic_context.lineTo(graphic_width, graphic_height);
+		//graphic_context.moveTo(0, 0);
+		//graphic_context.lineTo(0, graphic_height);
+		//graphic_context.moveTo(graphic_width, 0);
+		//graphic_context.lineTo(graphic_width, graphic_height);
 
-		var xBlackLines = blackLinesQuantity(horizontalDiapason);
+		//var xBlackLines = blackLinesQuantity(horizontalDiapason);
 		var xBlackStep = yBlackLinesStep(horizontalDiapason);
-		var xGreyLinesInSpan = greykLinesQuantity(xBlackLines);
-		var xGreyStep = xBlackStep / xGreyLinesInSpan;
-		var xStep = Math.floor((rightX - leftX) / 50);
-		var xMax = Math.floor(horizontalDiapason / xGreyStep);
+		//var xGreyLinesInSpan = greykLinesQuantity(xBlackLines);
+		//var xGreyStep = xBlackStep / xGreyLinesInSpan;
+		//var xStep = Math.floor((rightX - leftX) / 50);
+		//var xMax = Math.floor(horizontalDiapason / xGreyStep);
 		var oddXPiece = leftX % xBlackStep;
 
-		for (var x = 1; x <= xMax+xGreyLinesInSpan; x ++) {//vertical lines
+		/*for (var x = 1; x <= xMax+xGreyLinesInSpan; x ++) {//vertical lines
 			graphic_context.moveTo( ( x * xGreyStep - oddXPiece ) / horizontalDiapason * graphic_width, 0             );
 			graphic_context.lineTo( ( x * xGreyStep - oddXPiece ) / horizontalDiapason * graphic_width, graphic_height);
 
-		}
+		}*/
 	}//////////////////////////////////////////////////////////////
 
 	//horizontal lines/////////////////////////////////////////////
@@ -126,18 +126,18 @@ function drawLines(graphic_context, graphic_height, graphic_width, leftX, horizo
 		graphic_context.lineTo(graphic_width, graphic_height);
 
 
-		var yBlackLines = blackLinesQuantity(verticalDiapason);
+		//var yBlackLines = blackLinesQuantity(verticalDiapason);
 		var yBlackStep = yBlackLinesStep(verticalDiapason);
-		var yGreyLinesInSpan = greykLinesQuantity(yBlackLines);
-		var yGreyStep = yBlackStep / yGreyLinesInSpan;
-		var yLineInterval = 5;
-		var yMax = Math.floor(verticalDiapason / yGreyStep);
+		//var yGreyLinesInSpan = greykLinesQuantity(yBlackLines);
+		//var yGreyStep = yBlackStep / yGreyLinesInSpan;
+		//var yLineInterval = 5;
+		//var yMax = Math.floor(verticalDiapason / yGreyStep);
 		var oddYPiece = bottomY % yBlackStep;
 
-		for (var y = 1; y <= yMax +yGreyLinesInSpan; y++) {//horizontal lines
+		/*for (var y = 1; y <= yMax +yGreyLinesInSpan; y++) {//horizontal lines
 			graphic_context.moveTo(0            , (graphic_height - (y * yGreyStep - oddYPiece) / verticalDiapason * graphic_height));
 			graphic_context.lineTo(graphic_width, (graphic_height - (y * yGreyStep - oddYPiece) / verticalDiapason * graphic_height));
-		}
+		}*/
 
 		graphic_context.strokeStyle = "grey";
 		graphic_context.stroke();
@@ -157,19 +157,32 @@ function drawLines(graphic_context, graphic_height, graphic_width, leftX, horizo
 	//writing numbers + black lines
 	//+++++++++++++++++++++++++++++++++++++++++++++++++++++++++++
 	graphic_context.font = 'bold 15px Arial';
+	var textXIndent = -20;
 	var textIndent = 3;
 
 	var xSpecialRound;
 	var xMax = Math.floor( horizontalDiapason/ xBlackStep);
 
+	let oldDataText = "";
 	for (var x = 0; x <= xMax+1; x++) {//vertical lines
 		xSpecialRound = ( x * xBlackStep - oddXPiece );//strange but more precision = better result
 		//graphic_context.fillText( (+xSpecialRound + leftX).toFixed( precision(xBlackStep) ), ( x * xBlackStep - oddXPiece ) / horizontalDiapason *graphic_width +textIndent, graphic_height -textIndent );
 		//debugger;
-		graphic_context.fillText( new Date(+(+xSpecialRound + leftX).toFixed( 0 )).toLocaleString("en-US", {month: "short", day: "numeric"}), ( x * xBlackStep - oddXPiece ) / horizontalDiapason *graphic_width +textIndent, graphic_height -textIndent );
+		let dataText = new Date(+(+xSpecialRound + leftX).toFixed( 0 )).toLocaleString("en-US", {month: "short", day: "numeric"});
+		if (dataText == oldDataText){
+			dataText = "";
+		} else {
+			oldDataText = dataText;
+		}
 
-		graphic_context.moveTo( ( x * xBlackStep - oddXPiece ) / horizontalDiapason *graphic_width, 0);
-		graphic_context.lineTo( ( x * xBlackStep - oddXPiece ) / horizontalDiapason *graphic_width, graphic_height );
+		graphic_context.fillText(
+			dataText,
+			( x * xBlackStep - oddXPiece ) / horizontalDiapason *graphic_width +textXIndent- (dataText.length - 5)*5,
+			graphic_height - textIndent 
+			);
+
+		/*graphic_context.moveTo( ( x * xBlackStep - oddXPiece ) / horizontalDiapason *graphic_width, 0);
+		graphic_context.lineTo( ( x * xBlackStep - oddXPiece ) / horizontalDiapason *graphic_width, graphic_height );*/
 	}
 	graphic_context.strokeStyle = "#000";
 	graphic_context.stroke();
@@ -188,7 +201,7 @@ function drawLines(graphic_context, graphic_height, graphic_width, leftX, horizo
 		graphic_context.lineTo(graphic_width, (graphic_height - (y * yBlackStep - oddYPiece)/ verticalDiapason *graphic_height) );
 	}
 
-	graphic_context.strokeStyle = "black";
+	graphic_context.strokeStyle = "#888";
 	graphic_context.stroke();
 	graphic_context.beginPath();
 	//=====================================================================================================================
