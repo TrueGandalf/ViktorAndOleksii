@@ -937,7 +937,7 @@ function drawInfo(e) {
 			x = canvasGraph.width*199/200;
 		var y = canvasGraphY;
 
-		contextLiveGraph.fillStyle = "black";
+		contextLiveGraph.fillStyle = "grey";
 		//debugger;
 		//leftXvalue, rightXvalue, minYvalue, maxYvalue;
 		let xValue = leftXvalue + x / canvasGraph.width * (rightXvalue - leftXvalue);
@@ -949,11 +949,38 @@ function drawInfo(e) {
 		xValue = arrForInfo[xIndex];
 
 		contextLiveGraph.clearRect(0,0, canvasGraph.width, canvasGraph.height);
-		contextLiveGraph.fillRect(xValue-5, 0, 10, canvasGraph.height);
+		contextLiveGraph.fillRect(xValue-2, 0, 4, canvasGraph.height);
 		contextLiveGraph.fillStyle = "#000";
+
+		let leftXIndent, rightXIndent, topIndet, boxHeight;
+		leftXIndent = 50;
+		rightXIndent = 200;
+		topIndet = 200;
+		boxHeight = 150;
+
+		let boxLeftX = xValue - leftXIndent;
+		let boxRightX = xValue + rightXIndent;
+		let boxMiddleX = boxLeftX + (leftXIndent + rightXIndent) / 2;
+
+		let boxTopY = 0 + topIndet;
+		let boxBottomY = boxTopY + boxHeight;
+		let boxMiddleY = boxTopY + boxHeight / 2;
+
+
+		// Quadratric curves
+	    contextLiveGraph.beginPath();
+	    contextLiveGraph.moveTo(boxLeftX, boxMiddleY);
+	    //        A
+	    contextLiveGraph.bezierCurveTo(boxLeftX, boxTopY, boxLeftX, boxTopY, boxMiddleX, boxTopY);
+
+	    contextLiveGraph.bezierCurveTo(boxRightX, boxTopY, boxRightX, boxTopY, boxRightX, boxMiddleY);
+	    //        C
+	    contextLiveGraph.bezierCurveTo(boxRightX, boxBottomY, boxRightX, boxBottomY, boxMiddleX, boxBottomY);
+
+	    contextLiveGraph.bezierCurveTo(boxLeftX, boxBottomY, boxLeftX, boxBottomY, boxLeftX, boxMiddleY);
 				
 		contextLiveGraph.stroke();
-		contextLiveGraph.beginPath();
+		//contextLiveGraph.beginPath();
 		/*let sign = 1;
 		if(x<firstScopeCanvasX)
 			sign = -1;
