@@ -4,9 +4,10 @@ var ordinatArrays = [];
 var currentLeftX, currentRightX, currentMax, currentMin;
 var allLeftX, allRightX;
 var leftXvalue, rightXvalue, minYvalue, maxYvalue;
+var graphNum = 0;//4
+
 function buildGraphic() {
 	let timeStart = performance.now();
-	graphNum = 0;//4
 	arrayX.length = 0;
 	arrayY.length = 0;
 
@@ -24,12 +25,10 @@ function buildGraphic() {
 	ordinatArrays = data[graphNum].columns.slice(1).map(x=>x.slice(1));
 	let currentArrayY = ordinatArrays[0];
 
-		arrayX = data[graphNum].columns[0].slice(1);
-		showGraphic(undefined, undefined, undefined, undefined, currentArrayY, "graphic");
-		
-		showGraphic(undefined, undefined, undefined, undefined, currentArrayY, "summaryGraphic");
-	let timeEnd =  performance.now();
-	console.log("Time " + (timeEnd - timeStart));
+	arrayX = data[graphNum].columns[0].slice(1);
+
+	showGraphic(undefined, undefined, undefined, undefined, currentArrayY, "graphic");	
+	showGraphic(undefined, undefined, undefined, undefined, currentArrayY, "summaryGraphic");
 }
 function showGraphic(max, min, leftX, rightX, currentArrayY, divId) {
 	let showGraphicStart = performance.now();
@@ -41,16 +40,23 @@ function showGraphic(max, min, leftX, rightX, currentArrayY, divId) {
 	var graphic_width = document.getElementById(divId).width;
 	var graphic_height = document.getElementById(divId).height;
 
+	let changeLeftX = false;
 	if (!leftX && !(leftX===0) ) {
 		var leftX = window.arrayX[0];
+		changeLeftX = true;
 	}
 	if (!rightX && !(rightX===0) ) {
 		var rightX = arrayX[arrayX.length-1];
-		rightX = (rightX - leftX)*1.04 + leftX;
+		rightX = (rightX - leftX)*1.02 + leftX;
+	}
+	if(changeLeftX){
+		leftX = leftX - (rightX - leftX)/1.02*0.02;
 	}
 
+	let changeMin = false;
 	if (!min) {
-		var bottomY = 0;
+		var bottomY = Math.min.apply(Math, currentArrayY);
+		changeMin = true;
 	} else {
 		var bottomY = min;
 	}
@@ -60,6 +66,9 @@ function showGraphic(max, min, leftX, rightX, currentArrayY, divId) {
 		topY = (topY - bottomY)*1.04 + bottomY;
 	} else {
 		var topY = max;
+	}
+	if (changeMin){
+		bottomY = bottomY - (topY - bottomY)/1.04*0.04;
 	}
 
 	var horizontalDiapason = arrayX[arrayX.length-1] - window.arrayX[0];
@@ -294,10 +303,10 @@ function interpolation() {
 	document.getElementById("textareaXNewArray").innerHTML = arrayXNew.toString().replace(/,/g, "\n");
 	document.getElementById("textareaYNewArray").innerHTML = arrayYNew.toString().replace(/,/g, "\n");
 }
-function getMinimumValue() {
-	debugger;
-	var xLeft  = +document.getElementById("xLeftMinimumValue").value;
-	var xRight = +document.getElementById("xRightMinimumValue").value;
+function getMinimumValue(xLeft, xRight, allDataMax, arrayY) {
+	//debugger;
+	//var xLeft  = +document.getElementById("xLeftMinimumValue").value;
+	//var xRight = +document.getElementById("xRightMinimumValue").value;
 	var indexXLeft, indexXRight;
 
 	var i = 0;
@@ -313,14 +322,16 @@ function getMinimumValue() {
 	//i--; we ll use slice
 	indexXRight = i;
 
-	var minimum = Math.min.apply( Math, arrayY.slice(indexXLeft, indexXRight));
-	console.log(minimum);
-	document.getElementById("minimumValue").innerHTML = "y<sub>min</sub> = " + minimum;
+	var minimum = Math.min.apply( Math, arrayY.slice(indexXLeft, indexXRight+1));
+	//console.log(minimum);
+	//document.getElementById("minimumValue").innerHTML = "y<sub>min</sub> = " + minimum;
+	return minimum;
 }
-function getMaximumValue() {
+function getMaximumValue(xLeft, xRight, allDataMax, arrayY) {
+	//debugger;
 
-	var xLeft  = +document.getElementById("xLeftMaximumValue").value;
-	var xRight = +document.getElementById("xRightMaximumValue").value;
+	//var xLeft  = +document.getElementById("xLeftMaximumValue").value;
+	//var xRight = +document.getElementById("xRightMaximumValue").value;
 	var indexXLeft, indexXRight;
 
 	var i = 0;
@@ -336,9 +347,11 @@ function getMaximumValue() {
 	//i--; we ll use slice
 	indexXRight = i;
 
-	var maximum = Math.max.apply( Math, arrayY.slice(indexXLeft, indexXRight));
-	console.log(maximum);
-	document.getElementById("maximumValue").innerHTML = "y<sub>max</sub> = " + maximum;
+	var maximum = Math.max.apply( Math, arrayY.slice(indexXLeft, indexXRight+1));
+	console.log("maximum: " + maximum);
+	//document.getElementById("maximumValue").innerHTML = "y<sub>max</sub> = " + maximum;
+	//return (maximum < allDataMax) ? maximum : allDataMax;
+	return maximum;
 }
 function getYExactValue() {
 
@@ -640,8 +653,8 @@ function showRectangle(max, min, leftX, rightX) {
 	var canvasRectHeight = canvasTopY - canvasBottomY;
 	canvasTopY = graphic_height - canvasTopY;
 	//fillRect(x,y,width,height) - рисует заполненный прямоугольник
-	graphic_context.fillStyle = "red";
-	graphic_context.fillRect( canvasLeftX, canvasTopY, canvasRectWidth, canvasRectHeight );
+	//graphic_context.fillStyle = "red";
+	//graphic_context.fillRect( canvasLeftX, canvasTopY, canvasRectWidth, canvasRectHeight );
 
 	/* setTimeout(foo, delay, param1, param2, paramN);
 
@@ -820,6 +833,28 @@ function drawScope(e) {
 		
 		leftXvalue = allLeftX + ( firstScopeCanvasX < secondScopeCanvasX ? firstScopeCanvasX : secondScopeCanvasX ) / canvasScope.width * (allRightX - allLeftX);
 		rightXvalue = allLeftX + ( firstScopeCanvasX > secondScopeCanvasX ? firstScopeCanvasX : secondScopeCanvasX ) / canvasScope.width * (allRightX - allLeftX);
+
+		//console.log("leftXvalue: " + leftXvalue);
+
+		let maxYvalueArr = [];
+		let minYvalueArr = [];
+		for (let i = 0; i < ordinatArrays.length; i++){
+			maxYvalueArr.push(
+				getMaximumValue(leftXvalue, rightXvalue, "nothing", ordinatArrays[i])
+			);
+			minYvalueArr.push(
+				getMinimumValue(leftXvalue, rightXvalue, "nothing", ordinatArrays[i])
+			);
+		}
+		//debugger;
+		maxYvalue = Math.max(...maxYvalueArr);
+		minYvalue = Math.min(...minYvalueArr);
+		let yGap = maxYvalue - minYvalue;
+		maxYvalue += yGap *0.01;
+		minYvalue -= yGap *0.01;
+
+		
+		//console.log("maxYvalue: " + maxYvalue);
 
 		showRectangle(
 			maxYvalue,
