@@ -5,6 +5,7 @@ var currentLeftX, currentRightX, currentMax, currentMin;
 var allLeftX, allRightX;
 var leftXvalue, rightXvalue, minYvalue, maxYvalue;
 var graphNum = 0;//4
+var arrForInfo;
 
 function buildGraphic() {
 	let timeStart = performance.now();
@@ -220,7 +221,7 @@ function drawGraphic(graphic_context, graphic_height, graphic_width, leftX, hori
  rightX, verticalDiapason, bottomY, currentArrayY, currentColor) {
 
 	//graphic_context.moveTo( (arrayX[0]-leftX)/(rightX-leftX)*graphic_width , graphic_height);
-
+	arrForInfo = [];
 	var element = -666;
 	var newElement = 0;
 	for (var x = 1; x < graphic_width; x++ ) {
@@ -229,6 +230,7 @@ function drawGraphic(graphic_context, graphic_height, graphic_width, leftX, hori
 		if (newElement !== element) {
 			graphic_context.lineTo(( ( x * horizontalDiapason / (rightX - leftX) ) + ( (arrayX[0] - leftX) / (rightX - leftX) * graphic_width ) ), graphic_height - ( ( ( currentArrayY[Math.floor(x / (graphic_width - 1) * (currentArrayY.length - 1))] - bottomY) / (  verticalDiapason ) * graphic_height) + 1));
 			element = newElement;
+			arrForInfo[newElement] = ( ( x * horizontalDiapason / (rightX - leftX) ) + ( (arrayX[0] - leftX) / (rightX - leftX) * graphic_width ) );
 		}
 	}
 
@@ -303,10 +305,7 @@ function interpolation() {
 	document.getElementById("textareaXNewArray").innerHTML = arrayXNew.toString().replace(/,/g, "\n");
 	document.getElementById("textareaYNewArray").innerHTML = arrayYNew.toString().replace(/,/g, "\n");
 }
-function getMinimumValue(xLeft, xRight, allDataMax, arrayY) {
-	//debugger;
-	//var xLeft  = +document.getElementById("xLeftMinimumValue").value;
-	//var xRight = +document.getElementById("xRightMinimumValue").value;
+function getClosestXsIndexes(xLeft, xRight){
 	var indexXLeft, indexXRight;
 
 	var i = 0;
@@ -315,14 +314,29 @@ function getMinimumValue(xLeft, xRight, allDataMax, arrayY) {
 	}
 	indexXLeft = i;
 
+	if (xRight === undefined) {
+		return Math.abs(xLeft - arrayX[i-1]) < Math.abs(xLeft - arrayX[i]) ? i-1 : i ;
+	}
+
 	i = 0;
 	while(xRight >= arrayX[i]) {
 		i++;
 	}
-	//i--; we ll use slice
 	indexXRight = i;
+	return [indexXLeft, indexXRight];
+}
+function getMinimumValue(xLeft, xRight, allDataMax, arrayY) {
+	//debugger;
+	//var xLeft  = +document.getElementById("xLeftMinimumValue").value;
+	//var xRight = +document.getElementById("xRightMinimumValue").value;
+	//var indexXLeft, indexXRight;
+	var [indexXLeft, indexXRight] = getClosestXsIndexes(xLeft, xRight);
+	//debugger;
 
-	var minimum = Math.min.apply( Math, arrayY.slice(indexXLeft, indexXRight+1));
+
+
+	indexXLeft = (indexXLeft > 0) ? indexXLeft : 1;
+	var minimum = Math.min.apply( Math, arrayY.slice(indexXLeft-1, indexXRight+1));
 	//console.log(minimum);
 	//document.getElementById("minimumValue").innerHTML = "y<sub>min</sub> = " + minimum;
 	return minimum;
@@ -332,21 +346,9 @@ function getMaximumValue(xLeft, xRight, allDataMax, arrayY) {
 
 	//var xLeft  = +document.getElementById("xLeftMaximumValue").value;
 	//var xRight = +document.getElementById("xRightMaximumValue").value;
-	var indexXLeft, indexXRight;
+	var [indexXLeft, indexXRight] = getClosestXsIndexes(xLeft, xRight);
 
-	var i = 0;
-	while(xLeft > arrayX[i]) {
-		i++;
-	}
-	indexXLeft = i;
-
-	i = 0;
-	while(xRight > arrayX[i]) {
-		i++;
-	}
-	//i--; we ll use slice
-	indexXRight = i;
-
+	indexXLeft = (indexXLeft > 0) ? indexXLeft : 1;
 	var maximum = Math.max.apply( Math, arrayY.slice(indexXLeft, indexXRight+1));
 	console.log("maximum: " + maximum);
 	//document.getElementById("maximumValue").innerHTML = "y<sub>max</sub> = " + maximum;
@@ -731,23 +733,32 @@ var contextLive;
 var firstCanvasX, firstCanvasY,
 	secondCanvasX, secondCanvasY;
 
-var canvasScope;
-var contextScopeLive;
+var canvasGraph, canvasScope;
+var contextLiveGraph, contextScopeLive;
 var firstScopeCanvasX, firstScopeCanvasY,
-	secondScopeCanvasX, secondScopeCanvasY;
+	secondScopeCanvasX, secondScopeCanvasY,
+	canvasGraphX, canvasGraphY;
 
 window.onload = function() {
+	canvasGraph = document.getElementById("glassForGraphic");
+	contextLiveGraph = canvasGraph.getContext("2d"); 
     canvasScope = document.getElementById("summaryGlassForGraphic");    
 	contextLiveScope = canvasScope.getContext("2d");
 
 	// Подключаем требуемые для рисования события
 	canvasScope.onmousedown = startScopeDrawing;
+	canvasGraph.onmousedown = startInfoDrawing;
 	canvasScope.onmouseup = stopScopeDrawing;
+	canvasGraph.onmouseup = stopInfoDrawing;
 	
 	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	window.onmouseup = stopScopeDrawing;
+	window.onmouseup = ( () => stopScopeDrawing(), stopInfoDrawing() );
+	//window.onmouseup = stopInfoDrawing;
+
 
 	canvasScope.onmousemove = drawScope;
+	canvasGraph.onmousemove = drawInfo;
+
 	setFullScreen();
 
 	// Set up touch events for mobile
@@ -760,10 +771,12 @@ window.onload = function() {
 	  });
 	  canvasScope.dispatchEvent(mouseEvent);
 	}, false);
+
 	canvasScope.addEventListener("touchend", function (e) {
 	  var mouseEvent = new MouseEvent("mouseup", {});
 	  canvasScope.dispatchEvent(mouseEvent);
 	}, false);
+
 	canvasScope.addEventListener("touchmove", function (e) {
 	  var touch = e.touches[0];
 	  var mouseEvent = new MouseEvent("mousemove", {
@@ -781,10 +794,42 @@ window.onload = function() {
 	    y: touchEvent.touches[0].clientY - rect.top
 	  };
 	}
+
+	/*// Get a regular interval for drawing to the screen
+	window.requestAnimFrame = (function (callback) {
+	        return window.requestAnimationFrame || 
+	           window.webkitRequestAnimationFrame ||
+	           window.mozRequestAnimationFrame ||
+	           window.oRequestAnimationFrame ||
+	           window.msRequestAnimaitonFrame ||
+	           function (callback) {
+	        window.setTimeout(callback, 1000/60);
+	           };
+	})();
+
+	// Draw to the canvas
+	function renderCanvas() {
+	  if (isInfoDrawing) {
+	    ctx.moveTo(lastPos.x, lastPos.y);
+	    ctx.lineTo(mousePos.x, mousePos.y);
+	    ctx.stroke();
+	    lastPos = mousePos;
+	    drawInfo();
+	  }
+	}
+
+	// Allow for animation
+	(function drawLoop () {
+	  requestAnimFrame(drawLoop);
+	  renderCanvas();
+	})();*/
 };
+
 window.addEventListener('resize', setFullScreen, false);
 
 var isScopeDrawing = false;
+var isInfoDrawing = false;
+
 function startScopeDrawing(e) {
 	// Начинаем рисовать
 	isScopeDrawing = true;
@@ -792,6 +837,10 @@ function startScopeDrawing(e) {
 	// Нажатием левой кнопки мыши помещаем "кисть" на холст
 	firstScopeCanvasX = e.pageX - canvasScope.offsetLeft;
 	firstScopeCanvasY = e.pageY - canvasScope.offsetTop;
+}
+function startInfoDrawing(e) {
+	isInfoDrawing = true;
+	drawInfo(e);
 }
 function drawScope(e) {
 	if (isScopeDrawing == true)
@@ -866,8 +915,109 @@ function drawScope(e) {
 		console.log("one drow " + (oneDrowEnd-oneDrowStart) );
 	}
 }
+function drawInfo(e) {
+	if (isInfoDrawing == true)
+	{
+		//setTimeout(drawInfoOnGraph, 0, e);
+	
+
+		canvasGraphX = e.pageX - canvasGraph.offsetLeft;
+		canvasGraphY = e.pageY - canvasGraph.offsetTop;
+
+		document.getElementById("glassForGraphic").width = document.getElementById("glassForGraphic").width;
+		//debugger;
+		//console.log("...");
+		
+		var x = canvasGraphX;
+		/*if (x<0+canvasScope.width/200 || x>canvasScope.width*199/200)
+			return;*/
+		if (x < 0+canvasGraph.width/200)
+			x = 0+canvasGraph.width/200;
+		if (x > canvasGraph.width*199/200)
+			x = canvasGraph.width*199/200;
+		var y = canvasGraphY;
+
+		contextLiveGraph.fillStyle = "black";
+		//debugger;
+		//leftXvalue, rightXvalue, minYvalue, maxYvalue;
+		let xValue = leftXvalue + x / canvasGraph.width * (rightXvalue - leftXvalue);
+		let xIndex = getClosestXsIndexes(xValue);
+		console.log("xIndex: " + xIndex);
+		//let descretX = arrayX[xIndex];
+
+		//xValue = (descretX - leftXvalue)/(rightXvalue - leftXvalue) * canvasGraph.width;
+		xValue = arrForInfo[xIndex];
+
+		contextLiveGraph.clearRect(0,0, canvasGraph.width, canvasGraph.height);
+		contextLiveGraph.fillRect(xValue-5, 0, 10, canvasGraph.height);
+		contextLiveGraph.fillStyle = "#000";
+				
+		contextLiveGraph.stroke();
+		contextLiveGraph.beginPath();
+		/*let sign = 1;
+		if(x<firstScopeCanvasX)
+			sign = -1;
+		contextLiveScope.fillRect(
+			firstScopeCanvasX-canvasScope.width/200*sign,
+			0,
+			(x-firstScopeCanvasX)+canvasScope.width/100*sign,
+			canvasScope.height);
+		contextLiveScope.clearRect(
+			firstScopeCanvasX,
+			0+canvasScope.height/20,
+			(x-firstScopeCanvasX),
+			canvasScope.height-canvasScope.height/10 );
+
+		secondScopeCanvasX = e.pageX - canvasScope.offsetLeft;
+		if (secondScopeCanvasX < 0+canvasScope.width/200)
+			secondScopeCanvasX = 0+canvasScope.width/200;
+		if (secondScopeCanvasX > canvasScope.width*199/200)
+			secondScopeCanvasX = canvasScope.width*199/200;
+		secondScopeCanvasY = e.pageY - canvasScope.offsetTop;
+		
+		leftXvalue = allLeftX + ( firstScopeCanvasX < secondScopeCanvasX ? firstScopeCanvasX : secondScopeCanvasX ) / canvasScope.width * (allRightX - allLeftX);
+		rightXvalue = allLeftX + ( firstScopeCanvasX > secondScopeCanvasX ? firstScopeCanvasX : secondScopeCanvasX ) / canvasScope.width * (allRightX - allLeftX);
+
+		//console.log("leftXvalue: " + leftXvalue);
+
+		let maxYvalueArr = [];
+		let minYvalueArr = [];
+		for (let i = 0; i < ordinatArrays.length; i++){
+			maxYvalueArr.push(
+				getMaximumValue(leftXvalue, rightXvalue, "nothing", ordinatArrays[i])
+			);
+			minYvalueArr.push(
+				getMinimumValue(leftXvalue, rightXvalue, "nothing", ordinatArrays[i])
+			);
+		}
+		//debugger;
+		maxYvalue = Math.max(...maxYvalueArr);
+		minYvalue = Math.min(...minYvalueArr);
+		let yGap = maxYvalue - minYvalue;
+		maxYvalue += yGap *0.01;
+		minYvalue -= yGap *0.01;
+
+		
+		//console.log("maxYvalue: " + maxYvalue);
+
+		showRectangle(
+			maxYvalue,
+			minYvalue,
+			leftXvalue,
+			rightXvalue
+		)
+		let oneDrowEnd = performance.now();
+		console.log("one drow " + (oneDrowEnd-oneDrowStart) );*/
+	}
+}
+function drawInfoOnGraph(e) {
+
+}
 function stopScopeDrawing(e) {
 	isScopeDrawing = false;
+}
+function stopInfoDrawing(e) {
+	isInfoDrawing = false;
 }
 function hideShowDiv(divId){
 
