@@ -958,6 +958,10 @@ function drawInfo(e) {
 		topIndet = 200;
 		boxHeight = 150;
 
+		contextLiveGraph.clearRect(0,0, canvasGraph.width, canvasGraph.height);
+		contextLiveGraph.fillRect(xValue-1, topIndet+boxHeight-2, 2, canvasGraph.height);
+		contextLiveGraph.fillStyle = "#000";
+
 		let boxLeftX = xValue - leftXIndent;
 		let boxRightX = xValue + rightXIndent;
 		let boxMiddleX = boxLeftX + (leftXIndent + rightXIndent) / 2;
@@ -966,20 +970,20 @@ function drawInfo(e) {
 		let boxBottomY = boxTopY + boxHeight;
 		let boxMiddleY = boxTopY + boxHeight / 2;
 
-
+		//contextLiveGraph
+		//contextLiveGraph.globalAlpha = 0.5;
+		drawBox(contextLiveGraph, "#fff",
+			boxLeftX, boxRightX, boxMiddleX,
+			boxTopY, boxBottomY, boxMiddleY);
+		//var graphic_canvas = document.getElementById("graphic");
+		//var graphic_context = graphic_canvas.getContext("2d");
+		//console.log(graphic_canvas);
+		/*drawBox(graphic_context, "#fff",
+			boxLeftX, boxRightX, boxMiddleX,
+			boxTopY, boxBottomY, boxMiddleY);
+*/
 		// Quadratric curves
-	    contextLiveGraph.beginPath();
-	    contextLiveGraph.moveTo(boxLeftX, boxMiddleY);
-	    //        A
-	    contextLiveGraph.bezierCurveTo(boxLeftX, boxTopY, boxLeftX, boxTopY, boxMiddleX, boxTopY);
-
-	    contextLiveGraph.bezierCurveTo(boxRightX, boxTopY, boxRightX, boxTopY, boxRightX, boxMiddleY);
-	    //        C
-	    contextLiveGraph.bezierCurveTo(boxRightX, boxBottomY, boxRightX, boxBottomY, boxMiddleX, boxBottomY);
-
-	    contextLiveGraph.bezierCurveTo(boxLeftX, boxBottomY, boxLeftX, boxBottomY, boxLeftX, boxMiddleY);
-				
-		contextLiveGraph.stroke();
+	    
 		//contextLiveGraph.beginPath();
 		/*let sign = 1;
 		if(x<firstScopeCanvasX)
@@ -1039,6 +1043,24 @@ function drawInfo(e) {
 }
 function drawInfoOnGraph(e) {
 
+}
+function drawBox(context, color,
+			boxLeftX, boxRightX, boxMiddleX,
+			boxTopY, boxBottomY, boxMiddleY){
+	context.fillStyle = color;
+	context.beginPath();
+    context.moveTo(boxLeftX, boxMiddleY);
+    //        A
+    context.bezierCurveTo(boxLeftX, boxTopY, boxLeftX, boxTopY, boxMiddleX, boxTopY);
+
+    context.bezierCurveTo(boxRightX, boxTopY, boxRightX, boxTopY, boxRightX, boxMiddleY);
+    //        C
+    context.bezierCurveTo(boxRightX, boxBottomY, boxRightX, boxBottomY, boxMiddleX, boxBottomY);
+
+    context.bezierCurveTo(boxLeftX, boxBottomY, boxLeftX, boxBottomY, boxLeftX, boxMiddleY);
+			
+	context.stroke();
+	context.fill();
 }
 function stopScopeDrawing(e) {
 	isScopeDrawing = false;
