@@ -937,7 +937,7 @@ function drawInfo(e) {
 			x = canvasGraph.width*199/200;
 		var y = canvasGraphY;
 
-		contextLiveGraph.fillStyle = "grey";
+		contextLiveGraph.fillStyle = "#999";
 		//debugger;
 		//leftXvalue, rightXvalue, minYvalue, maxYvalue;
 		let xValue = leftXvalue + x / canvasGraph.width * (rightXvalue - leftXvalue);
@@ -948,22 +948,24 @@ function drawInfo(e) {
 		//xValue = (descretX - leftXvalue)/(rightXvalue - leftXvalue) * canvasGraph.width;
 		xValue = arrForInfo[xIndex];
 
-		contextLiveGraph.clearRect(0,0, canvasGraph.width, canvasGraph.height);
+		/*contextLiveGraph.clearRect(0,0, canvasGraph.width, canvasGraph.height);
 		contextLiveGraph.fillRect(xValue-2, 0, 4, canvasGraph.height);
-		contextLiveGraph.fillStyle = "#000";
+		contextLiveGraph.fillStyle = "#000";*/
 
 		let leftXIndent, rightXIndent, topIndet, boxHeight;
-		leftXIndent = 50;
-		rightXIndent = 200;
-		topIndet = 200;
-		boxHeight = 150;
+		leftXIndent = 60;
+		rightXIndent = 60;
+		topIndet = 20;
+		boxHeight = 80;
 
 		contextLiveGraph.clearRect(0,0, canvasGraph.width, canvasGraph.height);
-		contextLiveGraph.fillRect(xValue-1, topIndet+boxHeight-2, 2, canvasGraph.height);
-		contextLiveGraph.fillStyle = "#000";
+		contextLiveGraph.fillRect(xValue-1, 0, 2, canvasGraph.height);
+		contextLiveGraph.fillStyle = "#999";
 
-		let boxLeftX = xValue - leftXIndent;
-		let boxRightX = xValue + rightXIndent;
+		let canvasMiddleX = canvasGraph.width/2;
+
+		let boxLeftX = canvasMiddleX - leftXIndent;
+		let boxRightX = canvasMiddleX + rightXIndent;
 		let boxMiddleX = boxLeftX + (leftXIndent + rightXIndent) / 2;
 
 		let boxTopY = 0 + topIndet;
@@ -974,7 +976,9 @@ function drawInfo(e) {
 		//contextLiveGraph.globalAlpha = 0.5;
 		drawBox(contextLiveGraph, "#fff",
 			boxLeftX, boxRightX, boxMiddleX,
-			boxTopY, boxBottomY, boxMiddleY);
+			boxTopY, boxBottomY, boxMiddleY,
+			xValue, xIndex);
+
 		//var graphic_canvas = document.getElementById("graphic");
 		//var graphic_context = graphic_canvas.getContext("2d");
 		//console.log(graphic_canvas);
@@ -1046,7 +1050,8 @@ function drawInfoOnGraph(e) {
 }
 function drawBox(context, color,
 			boxLeftX, boxRightX, boxMiddleX,
-			boxTopY, boxBottomY, boxMiddleY){
+			boxTopY, boxBottomY, boxMiddleY,
+			currentX, xIndex){
 	context.fillStyle = color;
 	context.beginPath();
     context.moveTo(boxLeftX, boxMiddleY);
@@ -1061,12 +1066,38 @@ function drawBox(context, color,
 			
 	context.stroke();
 	context.fill();
+
+	context.fillStyle = "#000";
+	//context.strokeStyle = "#F00";
+	context.font = "bold 18px Georgia sans-serif";
+	//debugger;
+	let dataText = new Date(+arrayX[xIndex]).toLocaleString("en-US", {weekday: "short", month: "short", day: "numeric"});
+	context.fillText(dataText, boxLeftX + 20, boxTopY + 20, 80);
+	//context.font = 'bold 30px sans-serif';
+	//context.strokeText("Stroke text", 20, 100);
+
+	context.fillStyle = "#F00";
+	//context.strokeStyle = "#F00";
+	context.font = "bold 20px Georgia sans-serif";
+	//debugger;
+	dataText = ordinatArrays[0][xIndex];
+	context.fillText(dataText, boxLeftX + 10, boxTopY + 40, 50);
+	dataText = data[graphNum].names.y0;
+	context.fillText(dataText, boxLeftX + 10, boxTopY + 60, 50);
+
+	context.fillStyle = "#0F0";
+	dataText = ordinatArrays[1][xIndex];
+	context.fillText(dataText, boxLeftX + 70, boxTopY + 40, 50);
+	dataText = data[graphNum].names.y1;
+	context.fillText(dataText, boxLeftX + 70, boxTopY + 60, 50);
+
 }
 function stopScopeDrawing(e) {
 	isScopeDrawing = false;
 }
 function stopInfoDrawing(e) {
 	isInfoDrawing = false;
+	document.getElementById("glassForGraphic").width = document.getElementById("glassForGraphic").width;
 }
 function hideShowDiv(divId){
 
