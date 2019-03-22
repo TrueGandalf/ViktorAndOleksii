@@ -318,6 +318,9 @@ function getClosestXsIndexes(xLeft, xRight){
 	var i = 0;
 	while(xLeft > arrayX[i]) {
 		i++;
+		if (i > 10000){
+			debugger;
+		}
 	}
 	indexXLeft = i;
 
@@ -328,6 +331,9 @@ function getClosestXsIndexes(xLeft, xRight){
 	i = 0;
 	while(xRight >= arrayX[i]) {
 		i++;
+		if (i > 10000){
+			debugger;
+		}
 	}
 	indexXRight = i;
 	return [indexXLeft, indexXRight];
@@ -702,6 +708,10 @@ function yBlackLinesStep(axisMaxValue) {
 	if (axisMaxValue<0) axisMaxValue *= -1;
 	var changedAxisMaxValue = axisMaxValue;
 	if (!changedAxisMaxValue) return;
+	if (changedAxisMaxValue === Infinity || changedAxisMaxValue === -Infinity){
+		//debugger;
+		return;
+	}
 	while (changedAxisMaxValue<1) {
 		multiplier *= 10;
 		changedAxisMaxValue *= 10;
