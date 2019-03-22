@@ -6,6 +6,7 @@ var allLeftX, allRightX;
 var leftXvalue, rightXvalue, minYvalue, maxYvalue;
 var graphNum = 0;//4
 var arrForInfo;
+var arrForInfoY;
 
 function buildGraphic() {
 	let timeStart = performance.now();
@@ -94,6 +95,8 @@ function showGraphic(max, min, leftX, rightX, currentArrayY, divId) {
 	//arrayX = data[0].columns[0].slice(1).join("\n");
 	//ordinatArrays = [];
 	//ordinatArrays = data[0].columns.slice(1).map(x=>x.slice(1));
+
+	arrForInfoY = [];
 	for (let i = 0; i < ordinatArrays.length; i++) {
 		currentColor = data[graphNum].colors[`y${i}`];
 		drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY, ordinatArrays[i], currentColor);
@@ -231,6 +234,10 @@ function drawGraphic(graphic_context, graphic_height, graphic_width, leftX, hori
 			graphic_context.lineTo(( ( x * horizontalDiapason / (rightX - leftX) ) + ( (arrayX[0] - leftX) / (rightX - leftX) * graphic_width ) ), graphic_height - ( ( ( currentArrayY[Math.floor(x / (graphic_width - 1) * (currentArrayY.length - 1))] - bottomY) / (  verticalDiapason ) * graphic_height) + 1));
 			element = newElement;
 			arrForInfo[newElement] = ( ( x * horizontalDiapason / (rightX - leftX) ) + ( (arrayX[0] - leftX) / (rightX - leftX) * graphic_width ) );
+			arrForInfoY[newElement]? 0 : arrForInfoY[newElement] = [];
+			arrForInfoY[newElement].push(
+				graphic_height - ( ( ( currentArrayY[Math.floor(x / (graphic_width - 1) * (currentArrayY.length - 1))] - bottomY) / (  verticalDiapason ) * graphic_height) + 1)
+			);
 		}
 	}
 
@@ -959,8 +966,39 @@ function drawInfo(e) {
 		boxHeight = 80;
 
 		contextLiveGraph.clearRect(0,0, canvasGraph.width, canvasGraph.height);
-		contextLiveGraph.fillRect(xValue-1, 0, 2, canvasGraph.height);
-		contextLiveGraph.fillStyle = "#999";
+
+		let maxCurrentYarr = [];
+		for (let i = 0; i < ordinatArrays.length; i++){
+			maxCurrentYarr.push(+arrForInfoY[xIndex][i]);
+		}
+		//debugger;
+		let maxCurrentY = Math.min(...maxCurrentYarr);
+		//let maxCurrentYOnCanvaas = canvasGraph.height/(maxYvalue-minYvalue) * maxCurrentY;
+
+
+		contextLiveGraph.fillRect(xValue-1, maxCurrentY, 2, canvasGraph.height);
+
+
+		//contextLiveGraph.fillStyle = "#000";
+		contextLiveGraph.beginPath();
+		contextLiveGraph.arc(xValue, arrForInfoY[xIndex][0], 4, 0, 2 * Math.PI);
+		contextLiveGraph.stroke();
+		contextLiveGraph.fillStyle = 'white';
+		contextLiveGraph.fill();
+		contextLiveGraph.lineWidth = 2;
+		contextLiveGraph.strokeStyle = '#0f0';
+		contextLiveGraph.stroke();
+
+		contextLiveGraph.beginPath();
+		contextLiveGraph.arc(xValue, arrForInfoY[xIndex][1], 4, 0, 2 * Math.PI);
+		contextLiveGraph.stroke();
+		contextLiveGraph.fillStyle = 'white';
+		contextLiveGraph.fill();
+		contextLiveGraph.lineWidth = 2;
+		contextLiveGraph.strokeStyle = '#f00';
+		contextLiveGraph.stroke();
+		
+		contextLiveGraph.strokeStyle = 'grey';
 
 		let canvasMiddleX = canvasGraph.width/2;
 
