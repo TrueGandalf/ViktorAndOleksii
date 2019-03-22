@@ -5,6 +5,8 @@ var currentLeftX, currentRightX, currentMax, currentMin;
 var allLeftX, allRightX;
 var leftXvalue, rightXvalue, minYvalue, maxYvalue;
 var graphNum = 0;//4
+var arrForInfo;
+var arrForInfoY;
 
 function buildGraphic() {
 	let timeStart = performance.now();
@@ -93,6 +95,8 @@ function showGraphic(max, min, leftX, rightX, currentArrayY, divId) {
 	//arrayX = data[0].columns[0].slice(1).join("\n");
 	//ordinatArrays = [];
 	//ordinatArrays = data[0].columns.slice(1).map(x=>x.slice(1));
+
+	arrForInfoY = [];
 	for (let i = 0; i < ordinatArrays.length; i++) {
 		currentColor = data[graphNum].colors[`y${i}`];
 		drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY, ordinatArrays[i], currentColor);
@@ -220,7 +224,7 @@ function drawGraphic(graphic_context, graphic_height, graphic_width, leftX, hori
  rightX, verticalDiapason, bottomY, currentArrayY, currentColor) {
 
 	//graphic_context.moveTo( (arrayX[0]-leftX)/(rightX-leftX)*graphic_width , graphic_height);
-
+	arrForInfo = [];
 	var element = -666;
 	var newElement = 0;
 	for (var x = 1; x < graphic_width; x++ ) {
@@ -229,6 +233,11 @@ function drawGraphic(graphic_context, graphic_height, graphic_width, leftX, hori
 		if (newElement !== element) {
 			graphic_context.lineTo(( ( x * horizontalDiapason / (rightX - leftX) ) + ( (arrayX[0] - leftX) / (rightX - leftX) * graphic_width ) ), graphic_height - ( ( ( currentArrayY[Math.floor(x / (graphic_width - 1) * (currentArrayY.length - 1))] - bottomY) / (  verticalDiapason ) * graphic_height) + 1));
 			element = newElement;
+			arrForInfo[newElement] = ( ( x * horizontalDiapason / (rightX - leftX) ) + ( (arrayX[0] - leftX) / (rightX - leftX) * graphic_width ) );
+			arrForInfoY[newElement]? 0 : arrForInfoY[newElement] = [];
+			arrForInfoY[newElement].push(
+				graphic_height - ( ( ( currentArrayY[Math.floor(x / (graphic_width - 1) * (currentArrayY.length - 1))] - bottomY) / (  verticalDiapason ) * graphic_height) + 1)
+			);
 		}
 	}
 
@@ -303,26 +312,44 @@ function interpolation() {
 	document.getElementById("textareaXNewArray").innerHTML = arrayXNew.toString().replace(/,/g, "\n");
 	document.getElementById("textareaYNewArray").innerHTML = arrayYNew.toString().replace(/,/g, "\n");
 }
-function getMinimumValue(xLeft, xRight, allDataMax, arrayY) {
-	//debugger;
-	//var xLeft  = +document.getElementById("xLeftMinimumValue").value;
-	//var xRight = +document.getElementById("xRightMinimumValue").value;
+function getClosestXsIndexes(xLeft, xRight){
 	var indexXLeft, indexXRight;
 
 	var i = 0;
 	while(xLeft > arrayX[i]) {
 		i++;
+		if (i > 10000){
+			debugger;
+		}
 	}
 	indexXLeft = i;
+
+	if (xRight === undefined) {
+		return Math.abs(xLeft - arrayX[i-1]) < Math.abs(xLeft - arrayX[i]) ? i-1 : i ;
+	}
 
 	i = 0;
 	while(xRight >= arrayX[i]) {
 		i++;
+		if (i > 10000){
+			debugger;
+		}
 	}
-	//i--; we ll use slice
 	indexXRight = i;
+	return [indexXLeft, indexXRight];
+}
+function getMinimumValue(xLeft, xRight, allDataMax, arrayY) {
+	//debugger;
+	//var xLeft  = +document.getElementById("xLeftMinimumValue").value;
+	//var xRight = +document.getElementById("xRightMinimumValue").value;
+	//var indexXLeft, indexXRight;
+	var [indexXLeft, indexXRight] = getClosestXsIndexes(xLeft, xRight);
+	//debugger;
 
-	var minimum = Math.min.apply( Math, arrayY.slice(indexXLeft, indexXRight+1));
+
+
+	indexXLeft = (indexXLeft > 0) ? indexXLeft : 1;
+	var minimum = Math.min.apply( Math, arrayY.slice(indexXLeft-1, indexXRight+1));
 	//console.log(minimum);
 	//document.getElementById("minimumValue").innerHTML = "y<sub>min</sub> = " + minimum;
 	return minimum;
@@ -332,21 +359,9 @@ function getMaximumValue(xLeft, xRight, allDataMax, arrayY) {
 
 	//var xLeft  = +document.getElementById("xLeftMaximumValue").value;
 	//var xRight = +document.getElementById("xRightMaximumValue").value;
-	var indexXLeft, indexXRight;
+	var [indexXLeft, indexXRight] = getClosestXsIndexes(xLeft, xRight);
 
-	var i = 0;
-	while(xLeft > arrayX[i]) {
-		i++;
-	}
-	indexXLeft = i;
-
-	i = 0;
-	while(xRight > arrayX[i]) {
-		i++;
-	}
-	//i--; we ll use slice
-	indexXRight = i;
-
+	indexXLeft = (indexXLeft > 0) ? indexXLeft : 1;
 	var maximum = Math.max.apply( Math, arrayY.slice(indexXLeft, indexXRight+1));
 	console.log("maximum: " + maximum);
 	//document.getElementById("maximumValue").innerHTML = "y<sub>max</sub> = " + maximum;
@@ -693,6 +708,10 @@ function yBlackLinesStep(axisMaxValue) {
 	if (axisMaxValue<0) axisMaxValue *= -1;
 	var changedAxisMaxValue = axisMaxValue;
 	if (!changedAxisMaxValue) return;
+	if (changedAxisMaxValue === Infinity || changedAxisMaxValue === -Infinity){
+		//debugger;
+		return;
+	}
 	while (changedAxisMaxValue<1) {
 		multiplier *= 10;
 		changedAxisMaxValue *= 10;
@@ -731,23 +750,32 @@ var contextLive;
 var firstCanvasX, firstCanvasY,
 	secondCanvasX, secondCanvasY;
 
-var canvasScope;
-var contextScopeLive;
+var canvasGraph, canvasScope;
+var contextLiveGraph, contextScopeLive;
 var firstScopeCanvasX, firstScopeCanvasY,
-	secondScopeCanvasX, secondScopeCanvasY;
+	secondScopeCanvasX, secondScopeCanvasY,
+	canvasGraphX, canvasGraphY;
 
 window.onload = function() {
+	canvasGraph = document.getElementById("glassForGraphic");
+	contextLiveGraph = canvasGraph.getContext("2d"); 
     canvasScope = document.getElementById("summaryGlassForGraphic");    
 	contextLiveScope = canvasScope.getContext("2d");
 
 	// Подключаем требуемые для рисования события
 	canvasScope.onmousedown = startScopeDrawing;
+	canvasGraph.onmousedown = startInfoDrawing;
 	canvasScope.onmouseup = stopScopeDrawing;
+	canvasGraph.onmouseup = stopInfoDrawing;
 	
 	//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-	window.onmouseup = stopScopeDrawing;
+	window.onmouseup = ( () => stopScopeDrawing(), stopInfoDrawing() );
+	//window.onmouseup = stopInfoDrawing;
+
 
 	canvasScope.onmousemove = drawScope;
+	canvasGraph.onmousemove = drawInfo;
+
 	setFullScreen();
 
 	// Set up touch events for mobile
@@ -760,10 +788,12 @@ window.onload = function() {
 	  });
 	  canvasScope.dispatchEvent(mouseEvent);
 	}, false);
+
 	canvasScope.addEventListener("touchend", function (e) {
 	  var mouseEvent = new MouseEvent("mouseup", {});
 	  canvasScope.dispatchEvent(mouseEvent);
 	}, false);
+
 	canvasScope.addEventListener("touchmove", function (e) {
 	  var touch = e.touches[0];
 	  var mouseEvent = new MouseEvent("mousemove", {
@@ -781,10 +811,42 @@ window.onload = function() {
 	    y: touchEvent.touches[0].clientY - rect.top
 	  };
 	}
+
+	/*// Get a regular interval for drawing to the screen
+	window.requestAnimFrame = (function (callback) {
+	        return window.requestAnimationFrame || 
+	           window.webkitRequestAnimationFrame ||
+	           window.mozRequestAnimationFrame ||
+	           window.oRequestAnimationFrame ||
+	           window.msRequestAnimaitonFrame ||
+	           function (callback) {
+	        window.setTimeout(callback, 1000/60);
+	           };
+	})();
+
+	// Draw to the canvas
+	function renderCanvas() {
+	  if (isInfoDrawing) {
+	    ctx.moveTo(lastPos.x, lastPos.y);
+	    ctx.lineTo(mousePos.x, mousePos.y);
+	    ctx.stroke();
+	    lastPos = mousePos;
+	    drawInfo();
+	  }
+	}
+
+	// Allow for animation
+	(function drawLoop () {
+	  requestAnimFrame(drawLoop);
+	  renderCanvas();
+	})();*/
 };
+
 window.addEventListener('resize', setFullScreen, false);
 
 var isScopeDrawing = false;
+var isInfoDrawing = false;
+
 function startScopeDrawing(e) {
 	// Начинаем рисовать
 	isScopeDrawing = true;
@@ -792,6 +854,10 @@ function startScopeDrawing(e) {
 	// Нажатием левой кнопки мыши помещаем "кисть" на холст
 	firstScopeCanvasX = e.pageX - canvasScope.offsetLeft;
 	firstScopeCanvasY = e.pageY - canvasScope.offsetTop;
+}
+function startInfoDrawing(e) {
+	isInfoDrawing = true;
+	drawInfo(e);
 }
 function drawScope(e) {
 	if (isScopeDrawing == true)
@@ -866,8 +932,220 @@ function drawScope(e) {
 		console.log("one drow " + (oneDrowEnd-oneDrowStart) );
 	}
 }
+function drawInfo(e) {
+	if (isInfoDrawing == true)
+	{
+		//setTimeout(drawInfoOnGraph, 0, e);
+	
+
+		canvasGraphX = e.pageX - canvasGraph.offsetLeft;
+		canvasGraphY = e.pageY - canvasGraph.offsetTop;
+
+		document.getElementById("glassForGraphic").width = document.getElementById("glassForGraphic").width;
+		//debugger;
+		//console.log("...");
+		
+		var x = canvasGraphX;
+		/*if (x<0+canvasScope.width/200 || x>canvasScope.width*199/200)
+			return;*/
+		if (x < 0+canvasGraph.width/200)
+			x = 0+canvasGraph.width/200;
+		if (x > canvasGraph.width*199/200)
+			x = canvasGraph.width*199/200;
+		var y = canvasGraphY;
+
+		contextLiveGraph.fillStyle = "#999";
+		//debugger;
+		//leftXvalue, rightXvalue, minYvalue, maxYvalue;
+		let xValue = leftXvalue + x / canvasGraph.width * (rightXvalue - leftXvalue);
+		let xIndex = getClosestXsIndexes(xValue);
+		console.log("xIndex: " + xIndex);
+		//let descretX = arrayX[xIndex];
+
+		//xValue = (descretX - leftXvalue)/(rightXvalue - leftXvalue) * canvasGraph.width;
+		xValue = arrForInfo[xIndex];
+
+		/*contextLiveGraph.clearRect(0,0, canvasGraph.width, canvasGraph.height);
+		contextLiveGraph.fillRect(xValue-2, 0, 4, canvasGraph.height);
+		contextLiveGraph.fillStyle = "#000";*/
+
+		let leftXIndent, rightXIndent, topIndet, boxHeight;
+		leftXIndent = 60;
+		rightXIndent = 60;
+		topIndet = 20;
+		boxHeight = 80;
+
+		contextLiveGraph.clearRect(0,0, canvasGraph.width, canvasGraph.height);
+
+		let maxCurrentYarr = [];
+		for (let i = 0; i < ordinatArrays.length; i++){
+			maxCurrentYarr.push(+arrForInfoY[xIndex][i]);
+		}
+		//debugger;
+		let maxCurrentY = Math.min(...maxCurrentYarr);
+		//let maxCurrentYOnCanvaas = canvasGraph.height/(maxYvalue-minYvalue) * maxCurrentY;
+
+
+		contextLiveGraph.fillRect(xValue-1, maxCurrentY, 2, canvasGraph.height);
+
+
+		//contextLiveGraph.fillStyle = "#000";
+		contextLiveGraph.beginPath();
+		contextLiveGraph.arc(xValue, arrForInfoY[xIndex][0], 4, 0, 2 * Math.PI);
+		contextLiveGraph.stroke();
+		contextLiveGraph.fillStyle = 'white';
+		contextLiveGraph.fill();
+		contextLiveGraph.lineWidth = 2;
+		contextLiveGraph.strokeStyle = '#0f0';
+		contextLiveGraph.stroke();
+
+		contextLiveGraph.beginPath();
+		contextLiveGraph.arc(xValue, arrForInfoY[xIndex][1], 4, 0, 2 * Math.PI);
+		contextLiveGraph.stroke();
+		contextLiveGraph.fillStyle = 'white';
+		contextLiveGraph.fill();
+		contextLiveGraph.lineWidth = 2;
+		contextLiveGraph.strokeStyle = '#f00';
+		contextLiveGraph.stroke();
+		
+		contextLiveGraph.strokeStyle = 'grey';
+
+		let canvasMiddleX = canvasGraph.width/2;
+
+		let boxLeftX = canvasMiddleX - leftXIndent;
+		let boxRightX = canvasMiddleX + rightXIndent;
+		let boxMiddleX = boxLeftX + (leftXIndent + rightXIndent) / 2;
+
+		let boxTopY = 0 + topIndet;
+		let boxBottomY = boxTopY + boxHeight;
+		let boxMiddleY = boxTopY + boxHeight / 2;
+
+		//contextLiveGraph
+		//contextLiveGraph.globalAlpha = 0.5;
+		drawBox(contextLiveGraph, "#fff",
+			boxLeftX, boxRightX, boxMiddleX,
+			boxTopY, boxBottomY, boxMiddleY,
+			xValue, xIndex);
+
+		//var graphic_canvas = document.getElementById("graphic");
+		//var graphic_context = graphic_canvas.getContext("2d");
+		//console.log(graphic_canvas);
+		/*drawBox(graphic_context, "#fff",
+			boxLeftX, boxRightX, boxMiddleX,
+			boxTopY, boxBottomY, boxMiddleY);
+*/
+		// Quadratric curves
+	    
+		//contextLiveGraph.beginPath();
+		/*let sign = 1;
+		if(x<firstScopeCanvasX)
+			sign = -1;
+		contextLiveScope.fillRect(
+			firstScopeCanvasX-canvasScope.width/200*sign,
+			0,
+			(x-firstScopeCanvasX)+canvasScope.width/100*sign,
+			canvasScope.height);
+		contextLiveScope.clearRect(
+			firstScopeCanvasX,
+			0+canvasScope.height/20,
+			(x-firstScopeCanvasX),
+			canvasScope.height-canvasScope.height/10 );
+
+		secondScopeCanvasX = e.pageX - canvasScope.offsetLeft;
+		if (secondScopeCanvasX < 0+canvasScope.width/200)
+			secondScopeCanvasX = 0+canvasScope.width/200;
+		if (secondScopeCanvasX > canvasScope.width*199/200)
+			secondScopeCanvasX = canvasScope.width*199/200;
+		secondScopeCanvasY = e.pageY - canvasScope.offsetTop;
+		
+		leftXvalue = allLeftX + ( firstScopeCanvasX < secondScopeCanvasX ? firstScopeCanvasX : secondScopeCanvasX ) / canvasScope.width * (allRightX - allLeftX);
+		rightXvalue = allLeftX + ( firstScopeCanvasX > secondScopeCanvasX ? firstScopeCanvasX : secondScopeCanvasX ) / canvasScope.width * (allRightX - allLeftX);
+
+		//console.log("leftXvalue: " + leftXvalue);
+
+		let maxYvalueArr = [];
+		let minYvalueArr = [];
+		for (let i = 0; i < ordinatArrays.length; i++){
+			maxYvalueArr.push(
+				getMaximumValue(leftXvalue, rightXvalue, "nothing", ordinatArrays[i])
+			);
+			minYvalueArr.push(
+				getMinimumValue(leftXvalue, rightXvalue, "nothing", ordinatArrays[i])
+			);
+		}
+		//debugger;
+		maxYvalue = Math.max(...maxYvalueArr);
+		minYvalue = Math.min(...minYvalueArr);
+		let yGap = maxYvalue - minYvalue;
+		maxYvalue += yGap *0.01;
+		minYvalue -= yGap *0.01;
+
+		
+		//console.log("maxYvalue: " + maxYvalue);
+
+		showRectangle(
+			maxYvalue,
+			minYvalue,
+			leftXvalue,
+			rightXvalue
+		)
+		let oneDrowEnd = performance.now();
+		console.log("one drow " + (oneDrowEnd-oneDrowStart) );*/
+	}
+}
+function drawInfoOnGraph(e) {
+
+}
+function drawBox(context, color,
+			boxLeftX, boxRightX, boxMiddleX,
+			boxTopY, boxBottomY, boxMiddleY,
+			currentX, xIndex){
+	context.fillStyle = color;
+	context.beginPath();
+    context.moveTo(boxLeftX, boxMiddleY);
+    //        A
+    context.bezierCurveTo(boxLeftX, boxTopY, boxLeftX, boxTopY, boxMiddleX, boxTopY);
+
+    context.bezierCurveTo(boxRightX, boxTopY, boxRightX, boxTopY, boxRightX, boxMiddleY);
+    //        C
+    context.bezierCurveTo(boxRightX, boxBottomY, boxRightX, boxBottomY, boxMiddleX, boxBottomY);
+
+    context.bezierCurveTo(boxLeftX, boxBottomY, boxLeftX, boxBottomY, boxLeftX, boxMiddleY);
+			
+	context.stroke();
+	context.fill();
+
+	context.fillStyle = "#000";
+	//context.strokeStyle = "#F00";
+	context.font = "bold 18px Georgia sans-serif";
+	//debugger;
+	let dataText = new Date(+arrayX[xIndex]).toLocaleString("en-US", {weekday: "short", month: "short", day: "numeric"});
+	context.fillText(dataText, boxLeftX + 20, boxTopY + 20, 80);
+	//context.font = 'bold 30px sans-serif';
+	//context.strokeText("Stroke text", 20, 100);
+
+	context.fillStyle = "#F00";
+	//context.strokeStyle = "#F00";
+	context.font = "bold 20px Georgia sans-serif";
+	//debugger;
+	dataText = ordinatArrays[0][xIndex];
+	context.fillText(dataText, boxLeftX + 10, boxTopY + 40, 50);
+	dataText = data[graphNum].names.y0;
+	context.fillText(dataText, boxLeftX + 10, boxTopY + 60, 50);
+
+	context.fillStyle = "#0F0";
+	dataText = ordinatArrays[1][xIndex];
+	context.fillText(dataText, boxLeftX + 70, boxTopY + 40, 50);
+	dataText = data[graphNum].names.y1;
+	context.fillText(dataText, boxLeftX + 70, boxTopY + 60, 50);
+
+}
 function stopScopeDrawing(e) {
 	isScopeDrawing = false;
+}
+function stopInfoDrawing(e) {
+	isInfoDrawing = false;
+	document.getElementById("glassForGraphic").width = document.getElementById("glassForGraphic").width;
 }
 function hideShowDiv(divId){
 
