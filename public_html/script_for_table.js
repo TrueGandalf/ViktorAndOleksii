@@ -1221,11 +1221,20 @@ function addButtons() {
 function colorMode() {
 	let link = document.getElementById("colorMode");
 	let html = document.documentElement;
+	let btCtn = document.getElementsByClassName("inputGroup");
 	link.innerText = `Switch to ${(link.innerText.split(" ")[2] == "Day") ? "Nigth" : "Day"} Mode`;
 	if (html.style.backgroundColor == "") {
 		html.style.backgroundColor = "#212121";
+		for (let i = 0; i < btCtn.length; i++) {
+			btCtn[i].children[1].style.color = "#fff";
+		}
 	} else {
 		html.style.backgroundColor = "";
+		if (btCtn[0].children[1].getAttribute("style")) {
+			for (let i = 0; i < btCtn.length; i++) {
+				btCtn[i].children[1].removeAttribute("style");
+			}
+		}
 	}
 }
 function buttonAdd(text, option) {
