@@ -34,8 +34,8 @@ function buildGraphic() {
 	let currentArrayY = ordinatArrays[0];
 
 	arrayX = data[radioSelect()].columns[0].slice(1);
-	let leftXvalue = arrayX[0];
-	let rightXvalue =  arrayX[arrayX.length-1];
+	leftXvalue = arrayX[0];
+	rightXvalue =  arrayX[arrayX.length-1];
 
 	let maxYvalueArr = [];
 		let minYvalueArr = [];
@@ -977,7 +977,11 @@ function drawInfo(e) {
 
 
 		//contextLiveGraph.fillStyle = "#000";
-		contextLiveGraph.beginPath();
+		for (let i = 0; i < ordinatArrays.length; i++){
+			drawInfoCircle(xIndex, xValue, i, data[radioSelect()].colors[`y${i}`]);
+		}
+
+		/*contextLiveGraph.beginPath();
 		contextLiveGraph.arc(xValue, arrForInfoY[xIndex][0], 4, 0, 2 * Math.PI);
 		contextLiveGraph.stroke();
 		contextLiveGraph.fillStyle = 'white';
@@ -993,7 +997,7 @@ function drawInfo(e) {
 		contextLiveGraph.fill();
 		contextLiveGraph.lineWidth = 2;
 		contextLiveGraph.strokeStyle = '#f00';
-		contextLiveGraph.stroke();
+		contextLiveGraph.stroke();*/
 		
 		contextLiveGraph.strokeStyle = 'grey';
 
@@ -1079,6 +1083,16 @@ function drawInfo(e) {
 		let oneDrowEnd = performance.now();
 		console.log("one drow " + (oneDrowEnd-oneDrowStart) );*/
 	}
+}
+function drawInfoCircle(xIndex, xValue, graphIndex, color){
+	contextLiveGraph.beginPath();
+	contextLiveGraph.arc(xValue, arrForInfoY[xIndex][graphIndex], 4, 0, 2 * Math.PI);
+	contextLiveGraph.stroke();
+	contextLiveGraph.fillStyle = 'white';
+	contextLiveGraph.fill();
+	contextLiveGraph.lineWidth = 2;
+	contextLiveGraph.strokeStyle = color;
+	contextLiveGraph.stroke();
 }
 function drawInfoOnGraph(e) {
 
