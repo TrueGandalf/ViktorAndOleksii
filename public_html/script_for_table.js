@@ -4,9 +4,15 @@ var ordinatArrays = [];
 var currentLeftX, currentRightX, currentMax, currentMin;
 var allLeftX, allRightX;
 var leftXvalue, rightXvalue, minYvalue, maxYvalue;
-var graphNum = 0;//4
 var arrForInfo;
 var arrForInfoY;
+
+function radioSelect() {
+	let radios = document.getElementsByName("graph");
+	for (var i = 0; i < radios.length; i++) {
+		if (radios[i].checked) return +radios[i].value;
+	}
+}
 
 function buildGraphic() {
 	let timeStart = performance.now();
@@ -24,13 +30,15 @@ function buildGraphic() {
 
 	
 	//ordinatArrays = [];
-	ordinatArrays = data[graphNum].columns.slice(1).map(x=>x.slice(1));
+	ordinatArrays = data[radioSelect()].columns.slice(1).map(x=>x.slice(1));
 	let currentArrayY = ordinatArrays[0];
 
-	arrayX = data[graphNum].columns[0].slice(1);
+	arrayX = data[radioSelect()].columns[0].slice(1);
 
 	showGraphic(undefined, undefined, undefined, undefined, currentArrayY, "graphic");	
 	showGraphic(undefined, undefined, undefined, undefined, currentArrayY, "summaryGraphic");
+
+	addButtons();
 }
 function showGraphic(max, min, leftX, rightX, currentArrayY, divId) {
 	let showGraphicStart = performance.now();
@@ -98,7 +106,7 @@ function showGraphic(max, min, leftX, rightX, currentArrayY, divId) {
 
 	arrForInfoY = [];
 	for (let i = 0; i < ordinatArrays.length; i++) {
-		currentColor = data[graphNum].colors[`y${i}`];
+		currentColor = data[radioSelect()].colors[`y${i}`];
 		drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY, ordinatArrays[i], currentColor);
 	}
 	//currentColor = "#0ff";
@@ -840,6 +848,8 @@ window.onload = function() {
 	  requestAnimFrame(drawLoop);
 	  renderCanvas();
 	})();*/
+	addButtons();
+	document.getElementById("colorMode").addEventListener("click", colorMode, false);
 };
 
 window.addEventListener('resize', setFullScreen, false);
@@ -1099,7 +1109,7 @@ function drawInfoOnGraph(e) {
 function drawBox(context, color,
 			boxLeftX, boxRightX, boxMiddleX,
 			boxTopY, boxBottomY, boxMiddleY,
-			currentX, xIndex){
+			currentX, xIndex) {
 	context.fillStyle = color;
 	context.beginPath();
     context.moveTo(boxLeftX, boxMiddleY);
@@ -1130,13 +1140,13 @@ function drawBox(context, color,
 	//debugger;
 	dataText = ordinatArrays[0][xIndex];
 	context.fillText(dataText, boxLeftX + 10, boxTopY + 40, 50);
-	dataText = data[graphNum].names.y0;
+	dataText = data[radioSelect()].names.y0;
 	context.fillText(dataText, boxLeftX + 10, boxTopY + 60, 50);
 
 	context.fillStyle = "#0F0";
 	dataText = ordinatArrays[1][xIndex];
 	context.fillText(dataText, boxLeftX + 70, boxTopY + 40, 50);
-	dataText = data[graphNum].names.y1;
+	dataText = data[radioSelect()].names.y1;
 	context.fillText(dataText, boxLeftX + 70, boxTopY + 60, 50);
 
 }
@@ -1199,8 +1209,63 @@ function putCommaText(id) {
 }
 function setFullScreen() {
 	document.getElementById("graphic").width = window.innerWidth - 50;
+	document.getElementById("graphic").height = document.getElementById("graphic").width / 3;
 	document.getElementById("glassForGraphic").width = window.innerWidth - 50;
+	document.getElementById("glassForGraphic").height = document.getElementById("glassForGraphic").width / 3;
 	document.getElementById("summaryGraphic").width = window.innerWidth - 50;
+	document.getElementById("summaryGraphic").height = document.getElementById("summaryGraphic").width / 14;
 	document.getElementById("summaryGlassForGraphic").width = window.innerWidth - 50;
+	document.getElementById("summaryGlassForGraphic").height = document.getElementById("summaryGlassForGraphic").width / 14;
 	buildGraphic();
+}
+function addButtons() {
+	let count = 1;
+	if (document.getElementById("buttons")) document.getElementById("buttons").parentElement.removeChild(document.getElementById("buttons"));
+	let div = document.createElement("div");
+	div.id = "buttons";
+	document.getElementById("container").insertBefore(div, document.getElementById("colorMode").parentElement);
+	for (let key in data[radioSelect()].colors) {
+		buttonAdd(data[radioSelect()].names[key], count);
+		styleAdd(data[radioSelect()].colors[key], count);
+		count++;
+	}
+}
+function colorMode() {
+	let link = document.getElementById("colorMode");
+	let html = document.documentElement;
+	let btCtn = document.getElementsByClassName("inputGroup");
+	link.innerText = `Switch to ${(link.innerText.split(" ")[2] == "Day") ? "Nigth" : "Day"} Mode`;
+	if (html.style.backgroundColor == "") {
+		html.style.backgroundColor = "#212121";
+		for (let i = 0; i < btCtn.length; i++) {
+			btCtn[i].children[1].style.color = "#fff";
+		}
+	} else {
+		html.style.backgroundColor = "";
+		if (btCtn[0].children[1].getAttribute("style")) {
+			for (let i = 0; i < btCtn.length; i++) {
+				btCtn[i].children[1].removeAttribute("style");
+			}
+		}
+	}
+}
+function buttonAdd(text, option) {
+	let btn = document.createElement("div");
+	btn.className = "inputGroup";
+	let input = document.createElement("input");
+	input.id = `option${option}`;
+	input.name = `option${option}`;
+	input.type = "checkbox";
+	input.checked = true;
+	let label = document.createElement("label");
+	label.innerText = text;
+	label.setAttribute("for", `option${option}`);
+	btn.appendChild(input);
+	btn.appendChild(label);
+	document.getElementById("buttons").appendChild(btn);
+}
+function styleAdd(color, option) {
+	let style = document.createElement("style");
+	style.innerText = `.inputGroup input:checked ~ label[for=option${option}]:after {\nbackground-color: ${color};\nborder-color: ${color};\n}`;
+	document.getElementById("buttons").appendChild(style);
 }

@@ -3,6 +3,7 @@
 	<meta charset='utf-8'>
 	<title>Telegram Contest</title>
 	<link rel="icon" type="image/png" href="favicon.png" />
+	<link href="https://fonts.googleapis.com/css?family=Fira+Sans" rel="stylesheet">
     <script src="http://code.jquery.com/jquery-1.11.0.min.js"></script>
 	<script src="chart_data_data_js.js"></script>
 	<script src='script_for_table.js'></script>
@@ -20,6 +21,23 @@
 </head>
 <body>
 <div id="container">
+	<div id="radio" class="center">
+	    <input type="radio" id="char1"
+	     name="graph" value="0" onchange="buildGraphic();" checked>
+	    <label for="char1">First</label>
+	    <input type="radio" id="char2"
+	     name="graph" value="1" onchange="buildGraphic();">
+	    <label for="char2">Second</label>
+	    <input type="radio" id="char3"
+	     name="graph" value="2" onchange="buildGraphic();">
+	    <label for="char3">Third</label>
+	    <input type="radio" id="char4"
+	     name="graph" value="3" onchange="buildGraphic();">
+	    <label for="char4">Fourth</label>
+	    <input type="radio" id="char5"
+	     name="graph" value="4" onchange="buildGraphic();">
+	    <label for="char5">Fifth</label>
+  	</div>
 	<div id="forGraphic">
 		<canvas id="graphic" width="1000" height="500"></canvas>
 		<canvas id="glassForGraphic" width="1000" height="500"></canvas>
@@ -28,6 +46,11 @@
 			<canvas id="summaryGraphic" width="1000" height="100"></canvas>
 			<canvas id="summaryGlassForGraphic" width="1000" height="100"></canvas>						
 		</div>
+	</div>
+	<div id="buttons">
+	</div>
+	<div class="center">
+		<a id="colorMode" href="#" onclick="return false;">Switch to Night Mode</a>
 	</div>	
 	<canvas id="void" width="1" height="100"></canvas>
 </div>
