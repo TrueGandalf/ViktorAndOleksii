@@ -205,6 +205,8 @@ function drawLines(graphic_context, graphic_height, graphic_width, leftX, horizo
 	var xSpecialRound;
 	var xMax = Math.floor( horizontalDiapason/ xBlackStep);
 
+	graphic_context.fillStyle = "grey";
+
 	let oldDataText = "";
 	for (var x = 0; x <= xMax+1; x++) {//vertical lines
 		xSpecialRound = ( x * xBlackStep - oddXPiece );//strange but more precision = better result
@@ -226,7 +228,7 @@ function drawLines(graphic_context, graphic_height, graphic_width, leftX, horizo
 		/*graphic_context.moveTo( ( x * xBlackStep - oddXPiece ) / horizontalDiapason *graphic_width, 0);
 		graphic_context.lineTo( ( x * xBlackStep - oddXPiece ) / horizontalDiapason *graphic_width, graphic_height );*/
 	}
-	graphic_context.strokeStyle = "#000";
+	graphic_context.strokeStyle = "grey";
 	graphic_context.stroke();
 	graphic_context.beginPath();
 
@@ -243,7 +245,7 @@ function drawLines(graphic_context, graphic_height, graphic_width, leftX, horizo
 		graphic_context.lineTo(graphic_width, (graphic_height - (y * yBlackStep - oddYPiece)/ verticalDiapason *graphic_height) );
 	}
 
-	graphic_context.strokeStyle = "#888";
+	graphic_context.strokeStyle = "#888";	
 	graphic_context.stroke();
 	graphic_context.beginPath();
 	//=====================================================================================================================
@@ -1088,7 +1090,9 @@ function drawInfoCircle(xIndex, xValue, graphIndex, color){
 	contextLiveGraph.beginPath();
 	contextLiveGraph.arc(xValue, arrForInfoY[xIndex][graphIndex], 4, 0, 2 * Math.PI);
 	contextLiveGraph.stroke();
-	contextLiveGraph.fillStyle = 'white';
+	let fillColor = document.documentElement.style.backgroundColor;
+	fillColor = fillColor ? fillColor : "#fff"; 
+	contextLiveGraph.fillStyle = fillColor;
 	contextLiveGraph.fill();
 	contextLiveGraph.lineWidth = 2;
 	contextLiveGraph.strokeStyle = color;
@@ -1101,7 +1105,10 @@ function drawBox(context, color,
 			boxLeftX, boxRightX, boxMiddleX,
 			boxTopY, boxBottomY, boxMiddleY,
 			currentX, xIndex) {
-	context.fillStyle = color;
+	//color
+	let fillColor = document.documentElement.style.backgroundColor;
+	fillColor = fillColor ? fillColor : "#fff"; 
+	context.fillStyle = fillColor;
 	context.beginPath();
     context.moveTo(boxLeftX, boxMiddleY);
     //        A
