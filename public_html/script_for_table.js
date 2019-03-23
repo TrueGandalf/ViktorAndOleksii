@@ -6,6 +6,8 @@ var allLeftX, allRightX;
 var leftXvalue, rightXvalue, minYvalue, maxYvalue;
 var arrForInfo;
 var arrForInfoY;
+var allGraphsInGroup = [];
+var checksArr;
 
 function radioSelect() {
 	let radios = document.getElementsByName("graph");
@@ -18,7 +20,13 @@ function buildGraphic() {
 	let timeStart = performance.now();
 	arrayX.length = 0;
 	arrayY.length = 0;
-
+	if (allGraphsInGroup.columns == undefined){
+		debugger;
+		changeGraphsInGroup();
+	}
+	debugger;
+	document.getElementById("summaryGlassForGraphic").width = 
+	document.getElementById("summaryGlassForGraphic").width;// redraw canvas 
 
 	
 	
@@ -29,11 +37,18 @@ function buildGraphic() {
 	//}
 
 	
-	//ordinatArrays = [];
-	ordinatArrays = data[radioSelect()].columns.slice(1).map(x=>x.slice(1));
+	ordinatArrays = [];
+	//checksArr
+	for(let i = 0; i < allGraphsInGroup.columns.length; i++){
+		if (i==0 || checksArr[i-1]){
+			ordinatArrays.push(allGraphsInGroup.columns[i]);
+		}
+	}
+	debugger;
+	ordinatArrays = allGraphsInGroup.columns.slice(1).map(x=>x.slice(1));
 	let currentArrayY = ordinatArrays[0];
 
-	arrayX = data[radioSelect()].columns[0].slice(1);
+	arrayX = allGraphsInGroup.columns[0].slice(1);
 	leftXvalue = arrayX[0];
 	rightXvalue =  arrayX[arrayX.length-1];
 
@@ -61,7 +76,7 @@ function buildGraphic() {
 }
 function showGraphic(max, min, leftX, rightX, currentArrayY, divId) {
 	let showGraphicStart = performance.now();
-	document.getElementById(divId).width = document.getElementById(divId).width;// redraw canvas
+	document.getElementById(divId).width = document.getElementById(divId).width;// redraw canvas 
 
 	var graphic_canvas = document.getElementById(divId);
 	var graphic_context = graphic_canvas.getContext("2d");
@@ -127,7 +142,7 @@ function showGraphic(max, min, leftX, rightX, currentArrayY, divId) {
 		arrForInfoY = [];
 	}
 	for (let i = 0; i < ordinatArrays.length; i++) {
-		currentColor = data[radioSelect()].colors[`y${i}`];
+		currentColor = allGraphsInGroup.colors[`y${i}`];
 		drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY, ordinatArrays[i], currentColor);
 	}
 	//currentColor = "#0ff";
@@ -740,6 +755,7 @@ var firstScopeCanvasX, firstScopeCanvasY,
 	canvasGraphX, canvasGraphY;
 
 window.onload = function() {
+
 	canvasGraph = document.getElementById("glassForGraphic");
 	contextLiveGraph = canvasGraph.getContext("2d"); 
     canvasScope = document.getElementById("summaryGlassForGraphic");    
@@ -980,7 +996,7 @@ function drawInfo(e) {
 
 		//contextLiveGraph.fillStyle = "#000";
 		for (let i = 0; i < ordinatArrays.length; i++){
-			drawInfoCircle(xIndex, xValue, i, data[radioSelect()].colors[`y${i}`]);
+			drawInfoCircle(xIndex, xValue, i, allGraphsInGroup.colors[`y${i}`]);
 		}
 
 		/*contextLiveGraph.beginPath();
@@ -1138,13 +1154,13 @@ function drawBox(context, color,
 	//debugger;
 	dataText = ordinatArrays[0][xIndex];
 	context.fillText(dataText, boxLeftX + 10, boxTopY + 40, 50);
-	dataText = data[radioSelect()].names.y0;
+	dataText = allGraphsInGroup.names.y0;
 	context.fillText(dataText, boxLeftX + 10, boxTopY + 60, 50);
 
 	context.fillStyle = "#0F0";
 	dataText = ordinatArrays[1][xIndex];
 	context.fillText(dataText, boxLeftX + 70, boxTopY + 40, 50);
-	dataText = data[radioSelect()].names.y1;
+	dataText = allGraphsInGroup.names.y1;
 	context.fillText(dataText, boxLeftX + 70, boxTopY + 60, 50);
 
 }
@@ -1222,9 +1238,9 @@ function addButtons() {
 	let div = document.createElement("div");
 	div.id = "buttons";
 	document.getElementById("container").insertBefore(div, document.getElementById("colorMode").parentElement);
-	for (let key in data[radioSelect()].colors) {
-		buttonAdd(data[radioSelect()].names[key], count);
-		styleAdd(data[radioSelect()].colors[key], count);
+	for (let key in allGraphsInGroup.colors) {
+		buttonAdd(allGraphsInGroup.names[key], count);
+		styleAdd(allGraphsInGroup.colors[key], count);
 		count++;
 	}
 }
@@ -1255,6 +1271,7 @@ function buttonAdd(text, option) {
 	input.name = `option${option}`;
 	input.type = "checkbox";
 	input.checked = true;
+	input.onclick = changeGraphsInGroup;
 	let label = document.createElement("label");
 	label.innerText = text;
 	label.setAttribute("for", `option${option}`);
@@ -1266,4 +1283,40 @@ function styleAdd(color, option) {
 	let style = document.createElement("style");
 	style.innerText = `.inputGroup input:checked ~ label[for=option${option}]:after {\nbackground-color: ${color};\nborder-color: ${color};\n}`;
 	document.getElementById("buttons").appendChild(style);
+}
+function changeGraphsInGroup(){
+	checksArr = [];
+	let nodes = document.querySelectorAll(".inputGroup");
+	if (nodes.length == 0){
+		allGraphsInGroup = data[radioSelect()];
+		return;
+	}
+	for (let i = 0; i < nodes.length; i++ ) {
+		checksArr.push(nodes[i].firstChild.checked);		
+	}
+	allGraphsInGroup = {};
+	debugger;
+	reallyAllGraphsInGroup = data[radioSelect()];
+	for (let prop in reallyAllGraphsInGroup){
+		if ( !Array.isArray(reallyAllGraphsInGroup[prop]) ){
+			let i = 0;
+			allGraphsInGroup[prop] = {};
+			for (let innerProp in reallyAllGraphsInGroup[prop]){
+				if (checksArr[i] || innerProp == "x"){
+					allGraphsInGroup[prop][innerProp] = (reallyAllGraphsInGroup[prop][innerProp]);
+				}				
+				i++;
+			}
+		}
+		else{
+			allGraphsInGroup[prop] = [];
+			for (let i = 0; i < reallyAllGraphsInGroup[prop].length; i++){
+				if (i==0 || checksArr[i-1]){
+					allGraphsInGroup[prop].push(reallyAllGraphsInGroup[prop][i]);
+				}
+			}	
+		}			
+	}
+	buildGraphic();
+	//allGraphsInGroup =
 }
