@@ -4,9 +4,15 @@ var ordinatArrays = [];
 var currentLeftX, currentRightX, currentMax, currentMin;
 var allLeftX, allRightX;
 var leftXvalue, rightXvalue, minYvalue, maxYvalue;
-var graphNum = 0;//4
 var arrForInfo;
 var arrForInfoY;
+
+function radioSelect() {
+	let radios = document.getElementsByName("graph");
+	for (var i = 0; i < radios.length; i++) {
+		if (radios[i].checked) return +radios[i].value;
+	}
+}
 
 function buildGraphic() {
 	let timeStart = performance.now();
@@ -24,13 +30,15 @@ function buildGraphic() {
 
 	
 	//ordinatArrays = [];
-	ordinatArrays = data[graphNum].columns.slice(1).map(x=>x.slice(1));
+	ordinatArrays = data[radioSelect()].columns.slice(1).map(x=>x.slice(1));
 	let currentArrayY = ordinatArrays[0];
 
-	arrayX = data[graphNum].columns[0].slice(1);
+	arrayX = data[radioSelect()].columns[0].slice(1);
 
 	showGraphic(undefined, undefined, undefined, undefined, currentArrayY, "graphic");	
 	showGraphic(undefined, undefined, undefined, undefined, currentArrayY, "summaryGraphic");
+
+	addButtons();
 }
 function showGraphic(max, min, leftX, rightX, currentArrayY, divId) {
 	let showGraphicStart = performance.now();
@@ -98,7 +106,7 @@ function showGraphic(max, min, leftX, rightX, currentArrayY, divId) {
 
 	arrForInfoY = [];
 	for (let i = 0; i < ordinatArrays.length; i++) {
-		currentColor = data[graphNum].colors[`y${i}`];
+		currentColor = data[radioSelect()].colors[`y${i}`];
 		drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY, ordinatArrays[i], currentColor);
 	}
 	//currentColor = "#0ff";
@@ -1132,13 +1140,13 @@ function drawBox(context, color,
 	//debugger;
 	dataText = ordinatArrays[0][xIndex];
 	context.fillText(dataText, boxLeftX + 10, boxTopY + 40, 50);
-	dataText = data[graphNum].names.y0;
+	dataText = data[radioSelect()].names.y0;
 	context.fillText(dataText, boxLeftX + 10, boxTopY + 60, 50);
 
 	context.fillStyle = "#0F0";
 	dataText = ordinatArrays[1][xIndex];
 	context.fillText(dataText, boxLeftX + 70, boxTopY + 40, 50);
-	dataText = data[graphNum].names.y1;
+	dataText = data[radioSelect()].names.y1;
 	context.fillText(dataText, boxLeftX + 70, boxTopY + 60, 50);
 
 }
@@ -1212,9 +1220,13 @@ function setFullScreen() {
 }
 function addButtons() {
 	let count = 1;
-	for (let key in data[graphNum].colors) {
-		buttonAdd(data[graphNum].names[key], count);
-		styleAdd(data[graphNum].colors[key], count);
+	if (document.getElementById("buttons")) document.getElementById("buttons").parentElement.removeChild(document.getElementById("buttons"));
+	let div = document.createElement("div");
+	div.id = "buttons";
+	document.getElementById("container").insertBefore(div, document.getElementById("colorMode").parentElement);
+	for (let key in data[radioSelect()].colors) {
+		buttonAdd(data[radioSelect()].names[key], count);
+		styleAdd(data[radioSelect()].colors[key], count);
 		count++;
 	}
 }

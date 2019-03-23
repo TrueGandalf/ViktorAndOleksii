@@ -13,14 +13,16 @@
 #buttons{
 	margin-top: 20px;
 }
-.modeLink{
+.center{
 	text-align: center;
-}
-#colorMode{
 	color: #1997c6;
 	font-family: 'Fira Sans', sans-serif;
-	font-size: 18px;
+	font-size: 16px;
 	font-weight: 400;
+}
+#colorMode{
+	color: inherit;
+	font-size: 18px;
 	text-decoration: none;
 }
 .inputGroup {
