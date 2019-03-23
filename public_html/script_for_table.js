@@ -840,6 +840,8 @@ window.onload = function() {
 	  requestAnimFrame(drawLoop);
 	  renderCanvas();
 	})();*/
+	addButtons();
+	document.getElementById("colorMode").addEventListener("click", colorMode, false);
 };
 
 window.addEventListener('resize', setFullScreen, false);
@@ -1099,7 +1101,7 @@ function drawInfoOnGraph(e) {
 function drawBox(context, color,
 			boxLeftX, boxRightX, boxMiddleX,
 			boxTopY, boxBottomY, boxMiddleY,
-			currentX, xIndex){
+			currentX, xIndex) {
 	context.fillStyle = color;
 	context.beginPath();
     context.moveTo(boxLeftX, boxMiddleY);
@@ -1199,8 +1201,50 @@ function putCommaText(id) {
 }
 function setFullScreen() {
 	document.getElementById("graphic").width = window.innerWidth - 50;
+	document.getElementById("graphic").height = document.getElementById("graphic").width / 3;
 	document.getElementById("glassForGraphic").width = window.innerWidth - 50;
+	document.getElementById("glassForGraphic").height = document.getElementById("glassForGraphic").width / 3;
 	document.getElementById("summaryGraphic").width = window.innerWidth - 50;
+	document.getElementById("summaryGraphic").height = document.getElementById("summaryGraphic").width / 14;
 	document.getElementById("summaryGlassForGraphic").width = window.innerWidth - 50;
+	document.getElementById("summaryGlassForGraphic").height = document.getElementById("summaryGlassForGraphic").width / 14;
 	buildGraphic();
+}
+function addButtons() {
+	let count = 1;
+	for (let key in data[graphNum].colors) {
+		buttonAdd(data[graphNum].names[key], count);
+		styleAdd(data[graphNum].colors[key], count);
+		count++;
+	}
+}
+function colorMode() {
+	let link = document.getElementById("colorMode");
+	let html = document.documentElement;
+	link.innerText = `Switch to ${(link.innerText.split(" ")[2] == "Day") ? "Nigth" : "Day"} Mode`;
+	if (html.style.backgroundColor == "") {
+		html.style.backgroundColor = "#212121";
+	} else {
+		html.style.backgroundColor = "";
+	}
+}
+function buttonAdd(text, option) {
+	let btn = document.createElement("div");
+	btn.className = "inputGroup";
+	let input = document.createElement("input");
+	input.id = `option${option}`;
+	input.name = `option${option}`;
+	input.type = "checkbox";
+	input.checked = true;
+	let label = document.createElement("label");
+	label.innerText = text;
+	label.setAttribute("for", `option${option}`);
+	btn.appendChild(input);
+	btn.appendChild(label);
+	document.getElementById("buttons").appendChild(btn);
+}
+function styleAdd(color, option) {
+	let style = document.createElement("style");
+	style.innerText = `.inputGroup input:checked ~ label[for=option${option}]:after {\nbackground-color: ${color};\nborder-color: ${color};\n}`;
+	document.getElementById("buttons").appendChild(style);
 }
