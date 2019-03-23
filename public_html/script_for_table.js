@@ -34,9 +34,28 @@ function buildGraphic() {
 	let currentArrayY = ordinatArrays[0];
 
 	arrayX = data[radioSelect()].columns[0].slice(1);
+	let leftXvalue = arrayX[0];
+	let rightXvalue =  arrayX[arrayX.length-1];
 
-	showGraphic(undefined, undefined, undefined, undefined, currentArrayY, "graphic");	
-	showGraphic(undefined, undefined, undefined, undefined, currentArrayY, "summaryGraphic");
+	let maxYvalueArr = [];
+		let minYvalueArr = [];
+		for (let i = 0; i < ordinatArrays.length; i++){
+			maxYvalueArr.push(
+				getMaximumValue(leftXvalue, rightXvalue, "nothing", ordinatArrays[i])
+			);
+			minYvalueArr.push(
+				getMinimumValue(leftXvalue, rightXvalue, "nothing", ordinatArrays[i])
+			);
+		}
+		//debugger;
+		maxYvalue = Math.max(...maxYvalueArr);
+		minYvalue = Math.min(...minYvalueArr);
+		let yGap = maxYvalue - minYvalue;
+		maxYvalue += yGap *0.01;
+		minYvalue -= yGap *0.01;
+
+	showGraphic(maxYvalue, minYvalue, undefined, undefined, currentArrayY, "graphic");	
+	showGraphic(maxYvalue, minYvalue, undefined, undefined, currentArrayY, "summaryGraphic");
 
 	addButtons();
 }
@@ -95,6 +114,7 @@ function showGraphic(max, min, leftX, rightX, currentArrayY, divId) {
 	currentMin = bottomY;
 
 	if (divId == "graphic"){
+		//debugger;
 		drawLines(graphic_context, graphic_height, graphic_width, leftX, (rightX - leftX), rightX, verticalDiapason, bottomY);		
 	} else {
 		allRightX = rightX;
@@ -103,8 +123,9 @@ function showGraphic(max, min, leftX, rightX, currentArrayY, divId) {
 	//arrayX = data[0].columns[0].slice(1).join("\n");
 	//ordinatArrays = [];
 	//ordinatArrays = data[0].columns.slice(1).map(x=>x.slice(1));
-
-	arrForInfoY = [];
+	if (divId == "graphic"){
+		arrForInfoY = [];
+	}
 	for (let i = 0; i < ordinatArrays.length; i++) {
 		currentColor = data[radioSelect()].colors[`y${i}`];
 		drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY, ordinatArrays[i], currentColor);
@@ -586,55 +607,7 @@ function showRectangle(max, min, leftX, rightX) {
 		//alert("First you need to create a data array!\nLoad data and push \"Go! \"");
 		return;
 	}
-	//improve edges
-	if(0) {
-		//Improve Edges Y//////////////////////////////////////
-
-
-		var yDifference = max - min;
-		var reverseMultiplier = 1;
-
-		if (yDifference < 0) yDifference *= -1;
-		if (!yDifference) return;
-
-		while (yDifference < 1) {
-			yDifference *= 10;
-			reverseMultiplier /= 10;
-		}
-		while (yDifference >= 10) {
-			yDifference /= 10;
-			reverseMultiplier *= 10;
-		}
-		max = Math.ceil(max / reverseMultiplier * 10) * reverseMultiplier / 10;
-		maxYvalue = max;
-		min = Math.floor(min / reverseMultiplier * 10) * reverseMultiplier / 10;
-		minYvalue = min;
-
-		///////////////////////////////////////////////////////
-		//Improve Edges X//////////////////////////////////////
-
-
-		var xDifference = rightX - leftX;
-		var reverseMultiplier = 1;
-
-		if (xDifference < 0) xDifference *= -1;
-		if (!xDifference) return;
-
-		while (xDifference < 1) {
-			xDifference *= 10;
-			reverseMultiplier /= 10;
-		}
-		while (xDifference >= 10) {
-			xDifference /= 10;
-			reverseMultiplier *= 10;
-		}
-		rightX = Math.ceil(rightX / reverseMultiplier * 10) * reverseMultiplier / 10;
-		rightXvalue = rightX;
-		leftX = Math.floor(leftX / reverseMultiplier * 10) * reverseMultiplier / 10;
-		leftXvalue = leftX;
-
-		///////////////////////////////////////////////////////
-	}
+	
 	var graphic_canvas = document.getElementById("glassForGraphic");
 	var graphic_context = graphic_canvas.getContext("2d");
 
@@ -967,6 +940,10 @@ function drawInfo(e) {
 		contextLiveGraph.fillStyle = "#999";
 		//debugger;
 		//leftXvalue, rightXvalue, minYvalue, maxYvalue;
+		if (leftXvalue === undefined){
+			leftXvalue = allLeftX;
+			rightXvalue = allRightX;
+		}
 		let xValue = leftXvalue + x / canvasGraph.width * (rightXvalue - leftXvalue);
 		let xIndex = getClosestXsIndexes(xValue);
 		console.log("xIndex: " + xIndex);
@@ -986,7 +963,7 @@ function drawInfo(e) {
 		boxHeight = 80;
 
 		contextLiveGraph.clearRect(0,0, canvasGraph.width, canvasGraph.height);
-
+		//debugger;
 		let maxCurrentYarr = [];
 		for (let i = 0; i < ordinatArrays.length; i++){
 			maxCurrentYarr.push(+arrForInfoY[xIndex][i]);
