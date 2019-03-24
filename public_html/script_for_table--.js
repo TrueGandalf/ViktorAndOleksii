@@ -1383,33 +1383,21 @@ function changeGraphsInGroup(isItSecondCall){
 			}	
 		}			
 	}
-	if(!isItSecondCall){
-		debugger;
-		let diviser = 5;		
-		let oldTopFirst = maxYvalue;
-		let oldBotFirst = minYvalue;
+	if(!isItSecondCall){		
+		let oldTop = maxYvalue;
+		let oldBot = minYvalue;
 		let wasMagn = isMagnified;
-		let newTopBottomFirst;
-		let newTopBottomSecond;
-		let topSecond, botSecond;
-		let oldTopSecond, oldBotSecond;
-		let topDiffSecond;
-		let botDiffSecond
+		let newTopBottom;
 		if (!isMagnified){
-			newTopBottomFirst = buildGraphic(false, true);
+			newTopBottom = buildGraphic(false, true);
 		}
 		else{
-			newTopBottomFirst = buildGraphic(false, true);
-			[oldTopSecond, oldBotSecond] = saveScopeTopBottom;
+			[oldTop, oldBot] = saveScopeTopBottom;
 			justRedraw = true;
 			isScopeDrawing = true;
-			newTopBottomSecond = drawScope(false, false, true);
+			newTopBottom = drawScope(false, false, true);
 			justRedraw = false;
 			isScopeDrawing = false;
-
-			[topSecond, botSecond] = newTopBottomSecond;
-			topDiffSecond = (topSecond - oldTopSecond)/ diviser;
-			botDiffSecond = (botSecond - oldBotSecond)/ diviser;
 		}
 		isMagnified = wasMagn;
 		if (!oldAllGraphsInGroup)
@@ -1417,32 +1405,30 @@ function changeGraphsInGroup(isItSecondCall){
 		allGraphsInGroup = oldAllGraphsInGroup;
 		checksArr = oldChecksArr;
 
-		
-		let [topFirst, botFirst] = newTopBottomFirst;
+
+		let [top, bot] = newTopBottom;
 		/*maxYvalue += yGap *0.01;
 		minYvalue -= yGap *0.01;*/
-		if(topFirst == oldTopFirst && botFirst == oldBotFirst
-		&& topSecond == oldTopSecond && botSecond == oldBotSecond ){
+		if(top == oldTop && bot == oldBot){
 			changeGraphsInGroup(true);
 			debugger;
 			return;
 		}
 
-		let topDiffFirst = (topFirst - oldTopFirst)/ diviser;
-		//let topDiffSecond = (topSecond - oldTopSecond)/ diviser;
-		let botDiffFirst = (botFirst - oldBotFirst)/ diviser;
-		//let botDiffSecond = (botSecond - oldBotSecond)/ diviser;
+		let diviser = 5;
+		let topDiff = (top - oldTop)/ diviser;
+		let botDiff = (bot - oldBot)/ diviser;
 
 		if(isMagnified){
 			for (let i = 1; i <= diviser; i++){
-				setTimeout(buildGraphic, 50*i, ...[1, 0, oldTopFirst+topDiffFirst*i, oldBotFirst+botDiffFirst*i]);
+				setTimeout(buildGraphic, 50*i, ...[1, 0, oldTop+topDiff*i, oldBot+botDiff*i]);
 			}
 			justRedraw = true;
 			isScopeDrawing = true;
 
 			for (let i = 1; i <= diviser; i++){
 				//debugger;
-				setTimeout(drawScope, 50*i, "nothing", [oldTopSecond+topDiffSecond*i, oldBotSecond+botDiffSecond*i]);
+				setTimeout(drawScope, 50*i, "nothing", [oldTop+topDiff*i, oldBot+botDiff*i]);
 			}
 			//debugger;
 			setTimeout(()=>{justRedraw = false; isScopeDrawing = false;}, 50 * (diviser+1));
@@ -1453,7 +1439,7 @@ function changeGraphsInGroup(isItSecondCall){
 		}
 		else{
 			for (let i = 1; i <= diviser; i++){
-				setTimeout(buildGraphic, 50*i, ...[0, 0, oldTopFirst+topDiffFirst*i, oldBotFirst+botDiffFirst*i]);
+				setTimeout(buildGraphic, 50*i, ...[0, 0, oldTop+topDiff*i, oldBot+botDiff*i]);
 			}
 		}
 
