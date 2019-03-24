@@ -177,7 +177,7 @@ function showGraphic(max, min, leftX, rightX, currentArrayY, divId) {
 	//drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY, currentArrayY, currentColor);
 
 	let showGraphicEnd = performance.now();
-	console.log("one showGraphic : " + (showGraphicEnd - showGraphicStart));
+	//console.log("one showGraphic : " + (showGraphicEnd - showGraphicStart));
 }
 function drawLines(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY) {
 
@@ -291,7 +291,6 @@ function drawLines(graphic_context, graphic_height, graphic_width, leftX, horizo
 	graphic_context.stroke();
 	graphic_context.beginPath();
 	//=====================================================================================================================
-
 }
 function drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason,
  rightX, verticalDiapason, bottomY, currentArrayY, currentColor) {
@@ -436,7 +435,7 @@ function getMaximumValue(xLeft, xRight, allDataMax, arrayY) {
 
 	indexXLeft = (indexXLeft > 0) ? indexXLeft : 1;
 	var maximum = Math.max.apply( Math, arrayY.slice(indexXLeft, indexXRight+1));
-	console.log("maximum: " + maximum);
+	//console.log("maximum: " + maximum);
 	//document.getElementById("maximumValue").innerHTML = "y<sub>max</sub> = " + maximum;
 	//return (maximum < allDataMax) ? maximum : allDataMax;
 	return maximum;
@@ -615,7 +614,6 @@ function getAverage() {
 }
 // I dont use it, its a clone
 function changeGraphicVerticalDiapason(max, min, leftX, rightX) {
-
 
 	if(arrayX.length == 0) {
 		alert("First you need to create a data array!\nLoad data and push \"Go! \"");
@@ -866,7 +864,7 @@ window.onload = function() {
 	  requestAnimFrame(drawLoop);
 	  renderCanvas();
 	})();*/
-	addButtons();
+	
 	document.getElementById("colorMode").addEventListener("click", colorMode, false);
 };
 
@@ -875,18 +873,37 @@ window.addEventListener('resize', setFullScreen, false);
 var isScopeDrawing = false;
 var isInfoDrawing = false;
 
+let frameOffset = null;
 function startScopeDrawing(e) {
 	// Начинаем рисовать
 	isScopeDrawing = true;
 
-	// Нажатием левой кнопки мыши помещаем "кисть" на холст
-	firstScopeCanvasX = e.pageX - canvasScope.offsetLeft;
-	firstScopeCanvasY = e.pageY - canvasScope.offsetTop;
+	let x = e.pageX - canvasScope.offsetLeft;
+	let inOrder = (firstScopeCanvasX < secondScopeCanvasX) ? true : false;
+
+	if (!firstScopeCanvasX || (x < (inOrder ? firstScopeCanvasX - 5 : secondScopeCanvasX - 5) || x > (inOrder ? secondScopeCanvasX + 5 : firstScopeCanvasX + 5))) {
+		firstScopeCanvasX = e.pageX - canvasScope.offsetLeft;
+		frameOffset = null;
+	} else if (inOrder ? (x > firstScopeCanvasX - 5 && x < firstScopeCanvasX + 5) : (x > secondScopeCanvasX - 5 && x < secondScopeCanvasX + 5)) {
+		if (inOrder) firstScopeCanvasX = secondScopeCanvasX;
+		frameOffset = null;
+	} else if (inOrder ? (x > secondScopeCanvasX - 5 && x < secondScopeCanvasX + 5) : (x > firstScopeCanvasX - 5 && x < firstScopeCanvasX + 5)) {
+		if (!inOrder) firstScopeCanvasX = secondScopeCanvasX;
+		frameOffset = null;
+	} else if (x > (inOrder ? firstScopeCanvasX + 5 : secondScopeCanvasX + 5) && x < (inOrder ? secondScopeCanvasX - 5 : firstScopeCanvasX - 5)) {
+		if (!inOrder) {
+			let [a, b] = [firstScopeCanvasX, secondScopeCanvasX];
+			firstScopeCanvasX = b;
+			secondScopeCanvasX = a;
+		} 
+		frameOffset = [x - firstScopeCanvasX, secondScopeCanvasX - x];
+	}
 }
 function startInfoDrawing(e) {
 	isInfoDrawing = true;
 	drawInfo(e);
 }
+
 function drawScope(e, scopeRedrawTopBottom, justCalculateTopBottom) {
 	//debugger;
 	if (isScopeDrawing == true)
@@ -911,30 +928,45 @@ function drawScope(e, scopeRedrawTopBottom, justCalculateTopBottom) {
 
 		contextLiveScope.fillRect(0,0, canvasScope.width, canvasScope.height);
 		contextLiveScope.fillStyle = "#000";
-		let sign = 1;
-		if(x<firstScopeCanvasX)
-			sign = -1;
-		contextLiveScope.fillRect(
-			firstScopeCanvasX-canvasScope.width/200*sign,
-			0,
-			(x-firstScopeCanvasX)+canvasScope.width/100*sign,
-			canvasScope.height);
-		contextLiveScope.clearRect(
-			firstScopeCanvasX,
-			0+canvasScope.height/20,
-			(x-firstScopeCanvasX),
-			canvasScope.height-canvasScope.height/10 );
-		if (justRedraw)
-			secondScopeCanvasX = savedBottomGraphMouseXend;
-		else
-			secondScopeCanvasX = e.pageX - canvasScope.offsetLeft;
-		savedBottomGraphMouseXend = secondScopeCanvasX;
 
-		if (secondScopeCanvasX < 0+canvasScope.width/200)
-			secondScopeCanvasX = 0+canvasScope.width/200;
-		if (secondScopeCanvasX > canvasScope.width*199/200)
-			secondScopeCanvasX = canvasScope.width*199/200;
-		//secondScopeCanvasY = e.pageY - canvasScope.offsetTop;
+		let sign = (x>firstScopeCanvasX) ? 1 : -1;
+		if (frameOffset) {
+			contextLiveScope.fillRect(
+				(x - frameOffset[0])-canvasScope.width/200*sign,
+				0,
+				(frameOffset[0] + frameOffset[1])+canvasScope.width/100*sign,
+				canvasScope.height);
+			contextLiveScope.clearRect(
+				x - frameOffset[0],
+				0+canvasScope.height/20,
+				(frameOffset[0] + frameOffset[1]),
+				canvasScope.height-canvasScope.height/10 );
+
+			firstScopeCanvasX = x - frameOffset[0];
+			secondScopeCanvasX = x + frameOffset[1];
+			if (secondScopeCanvasX < 0+canvasScope.width/200)
+				secondScopeCanvasX = 0+canvasScope.width/200;
+			if (secondScopeCanvasX > canvasScope.width*199/200)
+				secondScopeCanvasX = canvasScope.width*199/200;
+		} else {
+			contextLiveScope.fillRect(
+				firstScopeCanvasX-canvasScope.width/200*sign,
+				0,
+				(x-firstScopeCanvasX)+canvasScope.width/100*sign,
+				canvasScope.height);
+			contextLiveScope.clearRect(
+				firstScopeCanvasX,
+				0+canvasScope.height/20,
+				(x-firstScopeCanvasX),
+				canvasScope.height-canvasScope.height/10 );
+
+			secondScopeCanvasX = e.pageX - canvasScope.offsetLeft;
+			if (secondScopeCanvasX < 0+canvasScope.width/200)
+				secondScopeCanvasX = 0+canvasScope.width/200;
+			if (secondScopeCanvasX > canvasScope.width*199/200)
+				secondScopeCanvasX = canvasScope.width*199/200;
+		}
+
 		
 		leftXvalue = allLeftX + ( firstScopeCanvasX < secondScopeCanvasX ? firstScopeCanvasX : secondScopeCanvasX ) / canvasScope.width * (allRightX - allLeftX);
 		rightXvalue = allLeftX + ( firstScopeCanvasX > secondScopeCanvasX ? firstScopeCanvasX : secondScopeCanvasX ) / canvasScope.width * (allRightX - allLeftX);
@@ -981,8 +1013,6 @@ function drawScope(e, scopeRedrawTopBottom, justCalculateTopBottom) {
 			leftXvalue,
 			rightXvalue
 		)
-		let oneDrowEnd = performance.now();
-		console.log("one drow " + (oneDrowEnd-oneDrowStart) );
 	}
 }
 function drawInfo(e) {
@@ -1167,7 +1197,6 @@ function drawInfoCircle(xIndex, xValue, graphIndex, color){
 	contextLiveGraph.stroke();
 }
 function drawInfoOnGraph(e) {
-
 }
 function drawBox(context, color,
 			boxLeftX, boxRightX, boxMiddleX,
@@ -1177,6 +1206,7 @@ function drawBox(context, color,
 	let fillColor = document.documentElement.style.backgroundColor;
 	fillColor = fillColor ? fillColor : "#fff"; 
 	context.fillStyle = fillColor;
+
 	context.beginPath();
     context.moveTo(boxLeftX, boxMiddleY);
     //        A
@@ -1214,7 +1244,6 @@ function drawBox(context, color,
 	context.fillText(dataText, boxLeftX + 70, boxTopY + 40, 50);
 	dataText = allGraphsInGroup.names.y1;
 	context.fillText(dataText, boxLeftX + 70, boxTopY + 60, 50);
-
 }
 function stopScopeDrawing(e) {
 	isScopeDrawing = false;
@@ -1274,13 +1303,13 @@ function putCommaText(id) {
     alert("Исходный текст с запятыми восстановлен.");
 }
 function setFullScreen() {
-	document.getElementById("graphic").width = window.innerWidth - 50;
-	document.getElementById("graphic").height = document.getElementById("graphic").width / 3;
-	document.getElementById("glassForGraphic").width = window.innerWidth - 50;
-	document.getElementById("glassForGraphic").height = document.getElementById("glassForGraphic").width / 3;
-	document.getElementById("summaryGraphic").width = window.innerWidth - 50;
+	document.getElementById("graphic").width = document.getElementById("forGraphic").clientWidth;
+	document.getElementById("graphic").height = document.getElementById("graphic").width / 3.5;
+	document.getElementById("glassForGraphic").width = document.getElementById("forGraphic").clientWidth;
+	document.getElementById("glassForGraphic").height = document.getElementById("glassForGraphic").width / 3.5;
+	document.getElementById("summaryGraphic").width = document.getElementById("forGraphic").nextElementSibling.clientWidth;
 	document.getElementById("summaryGraphic").height = document.getElementById("summaryGraphic").width / 14;
-	document.getElementById("summaryGlassForGraphic").width = window.innerWidth - 50;
+	document.getElementById("summaryGlassForGraphic").width = document.getElementById("forGraphic").nextElementSibling.clientWidth;
 	document.getElementById("summaryGlassForGraphic").height = document.getElementById("summaryGlassForGraphic").width / 14;
 	buildGraphic();
 }
