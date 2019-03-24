@@ -905,11 +905,8 @@ function startInfoDrawing(e) {
 }
 
 function drawScope(e, scopeRedrawTopBottom, justCalculateTopBottom) {
-	//debugger;
-	if (isScopeDrawing == true)
-	{
+	if (isScopeDrawing == true) {
 		isMagnified = true;
-		let oneDrowStart = performance.now();
 		// Определяем текущие координаты указателя мыши
 		var x;
 		if (justRedraw)
@@ -923,7 +920,6 @@ function drawScope(e, scopeRedrawTopBottom, justCalculateTopBottom) {
 			x = 0+canvasScope.width/200;
 		if (x > canvasScope.width*199/200)
 			x = canvasScope.width*199/200;
-		//var y = e.pageY - canvasScope.offsetTop;
 		contextLiveScope.fillStyle = "grey";
 
 		contextLiveScope.fillRect(0,0, canvasScope.width, canvasScope.height);
@@ -941,7 +937,12 @@ function drawScope(e, scopeRedrawTopBottom, justCalculateTopBottom) {
 				0+canvasScope.height/20,
 				(frameOffset[0] + frameOffset[1]),
 				canvasScope.height-canvasScope.height/10 );
-
+			if (justRedraw)
+				secondScopeCanvasX = savedBottomGraphMouseXend;
+			else
+				secondScopeCanvasX = e.pageX - canvasScope.offsetLeft;
+			savedBottomGraphMouseXend = secondScopeCanvasX;
+			
 			firstScopeCanvasX = x - frameOffset[0];
 			secondScopeCanvasX = x + frameOffset[1];
 			if (secondScopeCanvasX < 0+canvasScope.width/200)
@@ -960,13 +961,16 @@ function drawScope(e, scopeRedrawTopBottom, justCalculateTopBottom) {
 				(x-firstScopeCanvasX),
 				canvasScope.height-canvasScope.height/10 );
 
-			secondScopeCanvasX = e.pageX - canvasScope.offsetLeft;
+			if (justRedraw)
+				secondScopeCanvasX = savedBottomGraphMouseXend;
+			else
+				secondScopeCanvasX = e.pageX - canvasScope.offsetLeft;
+			savedBottomGraphMouseXend = secondScopeCanvasX;
 			if (secondScopeCanvasX < 0+canvasScope.width/200)
 				secondScopeCanvasX = 0+canvasScope.width/200;
 			if (secondScopeCanvasX > canvasScope.width*199/200)
 				secondScopeCanvasX = canvasScope.width*199/200;
 		}
-
 		
 		leftXvalue = allLeftX + ( firstScopeCanvasX < secondScopeCanvasX ? firstScopeCanvasX : secondScopeCanvasX ) / canvasScope.width * (allRightX - allLeftX);
 		rightXvalue = allLeftX + ( firstScopeCanvasX > secondScopeCanvasX ? firstScopeCanvasX : secondScopeCanvasX ) / canvasScope.width * (allRightX - allLeftX);
@@ -992,20 +996,16 @@ function drawScope(e, scopeRedrawTopBottom, justCalculateTopBottom) {
 		let yGap = maxYvalue - minYvalue;
 		maxYvalue += yGap *0.01;
 		minYvalue -= yGap *0.01;
-
+		
 		saveScopeTopBottom = [maxYvalue, minYvalue];
 
 		if(justCalculateTopBottom){
 			return [maxYvalue, minYvalue];
 		}
 
-		//if (justRedraw){
 		if (scopeRedrawTopBottom){
 			[maxYvalue, minYvalue] = scopeRedrawTopBottom;
 		}
-
-		
-		//console.log("maxYvalue: " + maxYvalue);
 
 		showRectangle(
 			maxYvalue,
