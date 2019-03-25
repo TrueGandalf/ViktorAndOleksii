@@ -612,7 +612,11 @@ function drawInfo(e) {
 			leftXvalue = allLeftX;
 			rightXvalue = allRightX;
 		}
-		let xValue = leftXvalue + x / canvasGraph.width * (rightXvalue - leftXvalue);
+		let xValue;
+		if (isMagnified)
+			xValue = leftXvalue + x / canvasGraph.width * (rightXvalue - leftXvalue);
+		else
+			xValue = leftXvalue + x / canvasGraph.width * (rightXvalue - leftXvalue)*1.04 - (rightXvalue - leftXvalue)*0.02;
 		let xIndex = getClosestXsIndexes(xValue);
 		
 		xValue = arrForInfo[xIndex];
