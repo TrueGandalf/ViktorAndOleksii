@@ -447,6 +447,7 @@ window.onload = function() {
 	
 	addButtons();	
 	document.getElementById("colorMode").addEventListener("click", colorMode, false);
+	setFullScreen();
 };
 
 window.addEventListener('resize', setFullScreen, false);
