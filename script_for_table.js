@@ -865,7 +865,9 @@ function changeGraphsInGroup(isItSecondCall){
 		}			
 	}
 	if(!isItSecondCall){
-		let diviser = 5;		
+		let frames = 10;
+		let animationTime = 250;
+		let frameTime = animationTime/frames;		
 		let oldTopFirst = maxYvalue;
 		let oldBotFirst = minYvalue;
 		let wasMagn = isMagnified;
@@ -888,8 +890,8 @@ function changeGraphsInGroup(isItSecondCall){
 			isScopeDrawing = false;
 
 			[topSecond, botSecond] = newTopBottomSecond;
-			topDiffSecond = (topSecond - oldTopSecond)/ diviser;
-			botDiffSecond = (botSecond - oldBotSecond)/ diviser;
+			topDiffSecond = (topSecond - oldTopSecond)/ frames;
+			botDiffSecond = (botSecond - oldBotSecond)/ frames;
 		}
 		isMagnified = wasMagn;
 		if (!oldAllGraphsInGroup)
@@ -905,29 +907,29 @@ function changeGraphsInGroup(isItSecondCall){
 			return;
 		}
 
-		let topDiffFirst = (topFirst - oldTopFirst)/ diviser;
-		let botDiffFirst = (botFirst - oldBotFirst)/ diviser;
+		let topDiffFirst = (topFirst - oldTopFirst)/ frames;
+		let botDiffFirst = (botFirst - oldBotFirst)/ frames;
 
 		if(isMagnified){
-			for (let i = 1; i <= diviser; i++){
-				setTimeout(buildGraphic, 50*i, ...[1, 0, oldTopFirst+topDiffFirst*i, oldBotFirst+botDiffFirst*i]);
+			for (let i = 1; i <= frames; i++){
+				setTimeout(buildGraphic, frameTime*i, ...[1, 0, oldTopFirst+topDiffFirst*i, oldBotFirst+botDiffFirst*i]);
 			}
 			justRedraw = true;
 			isScopeDrawing = true;
 
-			for (let i = 1; i <= diviser; i++){
-				setTimeout(drawScope, 50*i, "nothing", [oldTopSecond+topDiffSecond*i, oldBotSecond+botDiffSecond*i]);
+			for (let i = 1; i <= frames; i++){
+				setTimeout(drawScope, frameTime*i, "nothing", [oldTopSecond+topDiffSecond*i, oldBotSecond+botDiffSecond*i]);
 			}
 
-			setTimeout(()=>{justRedraw = false; isScopeDrawing = false;}, 50 * (diviser+1));
+			setTimeout(()=>{justRedraw = false; isScopeDrawing = false;}, frameTime * (frames+1));
 		}
 		else {
-			for (let i = 1; i <= diviser; i++){
-				setTimeout(buildGraphic, 50*i, ...[0, 0, oldTopFirst+topDiffFirst*i, oldBotFirst+botDiffFirst*i]);
+			for (let i = 1; i <= frames; i++){
+				setTimeout(buildGraphic, frameTime*i, ...[0, 0, oldTopFirst+topDiffFirst*i, oldBotFirst+botDiffFirst*i]);
 			}
 		}
 
-		setTimeout(changeGraphsInGroup, 50 * (diviser+1), true);
+		setTimeout(changeGraphsInGroup, frameTime * (frames+1), true);
 		return;
 	}
 	if(isMagnified){		
