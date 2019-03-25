@@ -1063,7 +1063,7 @@ function drawInfo(e) {
 		topIndet = 20;
 		boxHeight = 80;
 		if (allGraphsInGroup.columns.slice(1).length > 2)
-			boxHeight *=2;
+			boxHeight *=1.5;
 
 		contextLiveGraph.clearRect(0,0, canvasGraph.width, canvasGraph.height);
 		//debugger;
