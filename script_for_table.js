@@ -6,13 +6,6 @@ var allLeftX, allRightX;
 var leftXvalue, rightXvalue, minYvalue, maxYvalue;
 var arrForInfo;
 var arrForInfoY;
-var allGraphsInGroup = [];
-var checksArr = [true, true, true, true];
-var isMagnified;
-var savedBottomGraphMouseXstart, savedBottomGraphMouseXend;
-var justRedraw;
-var oldAllGraphsInGroup, oldChecksArr;
-var saveScopeTopBottom;
 
 function radioSelect() {
 	let radios = document.getElementsByName("graph");
@@ -21,19 +14,11 @@ function radioSelect() {
 	}
 }
 
-function buildGraphic(drawOnlyBottom, justCalculateTopBottom, predifinedTop, predifinedBottom) {
-	if (!drawOnlyBottom)
-		isMagnified = false;
-
+function buildGraphic() {
 	let timeStart = performance.now();
 	arrayX.length = 0;
 	arrayY.length = 0;
-	if (allGraphsInGroup.columns == undefined){
-		//debugger;
-		changeGraphsInGroup();
-	}
-	//debugger;
-	
+
 
 	
 	
@@ -44,59 +29,20 @@ function buildGraphic(drawOnlyBottom, justCalculateTopBottom, predifinedTop, pre
 	//}
 
 	
-	ordinatArrays = [];
-	//checksArr
-	//debugger;
-	//!!!!!! allGraphsInGroup is already chaged to rigth one should be!!!!!!!!!
-	/*for(let i = 1; i < allGraphsInGroup.columns.length; i++){
-		if (checksArr[i-1]){
-			ordinatArrays.push(allGraphsInGroup.columns[i]);
-		}
-	}
-	//debugger;*/
-	ordinatArrays = allGraphsInGroup.columns.slice(1).map(x=>x.slice(1));
+	//ordinatArrays = [];
+	ordinatArrays = data[radioSelect()].columns.slice(1).map(x=>x.slice(1));
 	let currentArrayY = ordinatArrays[0];
 
-	arrayX = allGraphsInGroup.columns[0].slice(1);
-	leftXvalue = arrayX[0];
-	rightXvalue =  arrayX[arrayX.length-1];
+	arrayX = data[radioSelect()].columns[0].slice(1);
 
-	let maxYvalueArr = [];
-		let minYvalueArr = [];
-		for (let i = 0; i < ordinatArrays.length; i++){
-			maxYvalueArr.push(
-				getMaximumValue(leftXvalue, rightXvalue, "nothing", ordinatArrays[i])
-			);
-			minYvalueArr.push(
-				getMinimumValue(leftXvalue, rightXvalue, "nothing", ordinatArrays[i])
-			);
-		}
-		//debugger;
-	maxYvalue = Math.max(...maxYvalueArr);
-	minYvalue = Math.min(...minYvalueArr);
-	let yGap = maxYvalue - minYvalue;
-	maxYvalue += yGap *0.01;
-	minYvalue -= yGap *0.01;
+	showGraphic(undefined, undefined, undefined, undefined, currentArrayY, "graphic");	
+	showGraphic(undefined, undefined, undefined, undefined, currentArrayY, "summaryGraphic");
 
-	if (justCalculateTopBottom) {
-		return [maxYvalue, minYvalue];
-	}
-
-	//predifinedTop, predifinedBottom
-	if (predifinedTop || predifinedBottom) {
-		maxYvalue = predifinedTop;
-		minYvalue = predifinedBottom;
-	}
-
-	if (!drawOnlyBottom)
-		showGraphic(maxYvalue, minYvalue, undefined, undefined, currentArrayY, "graphic");	
-	showGraphic(maxYvalue, minYvalue, undefined, undefined, currentArrayY, "summaryGraphic");
-
-	//addButtons();
+	addButtons();
 }
 function showGraphic(max, min, leftX, rightX, currentArrayY, divId) {
 	let showGraphicStart = performance.now();
-	document.getElementById(divId).width = document.getElementById(divId).width;// redraw canvas 
+	document.getElementById(divId).width = document.getElementById(divId).width;// redraw canvas
 
 	var graphic_canvas = document.getElementById(divId);
 	var graphic_context = graphic_canvas.getContext("2d");
@@ -149,7 +95,6 @@ function showGraphic(max, min, leftX, rightX, currentArrayY, divId) {
 	currentMin = bottomY;
 
 	if (divId == "graphic"){
-		//debugger;
 		drawLines(graphic_context, graphic_height, graphic_width, leftX, (rightX - leftX), rightX, verticalDiapason, bottomY);		
 	} else {
 		allRightX = rightX;
@@ -158,18 +103,10 @@ function showGraphic(max, min, leftX, rightX, currentArrayY, divId) {
 	//arrayX = data[0].columns[0].slice(1).join("\n");
 	//ordinatArrays = [];
 	//ordinatArrays = data[0].columns.slice(1).map(x=>x.slice(1));
-	if (divId == "graphic"){
-		arrForInfoY = [];
-	}
-	let trickyIndex = -1;
-	let rightIndexes = [];
-	for (let i = 0; i < checksArr.length; i++) {
-		if (checksArr[i])
-			rightIndexes.push(i);
-	}
-	//debugger;
+
+	arrForInfoY = [];
 	for (let i = 0; i < ordinatArrays.length; i++) {
-		currentColor = allGraphsInGroup.colors[`y${rightIndexes[i]}`];
+		currentColor = data[radioSelect()].colors[`y${i}`];
 		drawGraphic(graphic_context, graphic_height, graphic_width, leftX, horizontalDiapason, rightX, verticalDiapason, bottomY, ordinatArrays[i], currentColor);
 	}
 	//currentColor = "#0ff";
@@ -247,8 +184,6 @@ function drawLines(graphic_context, graphic_height, graphic_width, leftX, horizo
 	var xSpecialRound;
 	var xMax = Math.floor( horizontalDiapason/ xBlackStep);
 
-	graphic_context.fillStyle = "grey";
-
 	let oldDataText = "";
 	for (var x = 0; x <= xMax+1; x++) {//vertical lines
 		xSpecialRound = ( x * xBlackStep - oddXPiece );//strange but more precision = better result
@@ -270,7 +205,7 @@ function drawLines(graphic_context, graphic_height, graphic_width, leftX, horizo
 		/*graphic_context.moveTo( ( x * xBlackStep - oddXPiece ) / horizontalDiapason *graphic_width, 0);
 		graphic_context.lineTo( ( x * xBlackStep - oddXPiece ) / horizontalDiapason *graphic_width, graphic_height );*/
 	}
-	graphic_context.strokeStyle = "grey";
+	graphic_context.strokeStyle = "#000";
 	graphic_context.stroke();
 	graphic_context.beginPath();
 
@@ -287,7 +222,7 @@ function drawLines(graphic_context, graphic_height, graphic_width, leftX, horizo
 		graphic_context.lineTo(graphic_width, (graphic_height - (y * yBlackStep - oddYPiece)/ verticalDiapason *graphic_height) );
 	}
 
-	graphic_context.strokeStyle = "#888";	
+	graphic_context.strokeStyle = "#888";
 	graphic_context.stroke();
 	graphic_context.beginPath();
 	//=====================================================================================================================
@@ -391,7 +326,7 @@ function getClosestXsIndexes(xLeft, xRight){
 	while(xLeft > arrayX[i]) {
 		i++;
 		if (i > 10000){
-			//debugger;
+			debugger;
 		}
 	}
 	indexXLeft = i;
@@ -404,7 +339,7 @@ function getClosestXsIndexes(xLeft, xRight){
 	while(xRight >= arrayX[i]) {
 		i++;
 		if (i > 10000){
-			//debugger;
+			debugger;
 		}
 	}
 	indexXRight = i;
@@ -421,7 +356,7 @@ function getMinimumValue(xLeft, xRight, allDataMax, arrayY) {
 
 
 	indexXLeft = (indexXLeft > 0) ? indexXLeft : 1;
-	var minimum = Math.min.apply( Math, arrayY.slice(indexXLeft, indexXRight+1));
+	var minimum = Math.min.apply( Math, arrayY.slice(indexXLeft-1, indexXRight+1));
 	//console.log(minimum);
 	//document.getElementById("minimumValue").innerHTML = "y<sub>min</sub> = " + minimum;
 	return minimum;
@@ -649,7 +584,55 @@ function showRectangle(max, min, leftX, rightX) {
 		//alert("First you need to create a data array!\nLoad data and push \"Go! \"");
 		return;
 	}
-	
+	//improve edges
+	if(0) {
+		//Improve Edges Y//////////////////////////////////////
+
+
+		var yDifference = max - min;
+		var reverseMultiplier = 1;
+
+		if (yDifference < 0) yDifference *= -1;
+		if (!yDifference) return;
+
+		while (yDifference < 1) {
+			yDifference *= 10;
+			reverseMultiplier /= 10;
+		}
+		while (yDifference >= 10) {
+			yDifference /= 10;
+			reverseMultiplier *= 10;
+		}
+		max = Math.ceil(max / reverseMultiplier * 10) * reverseMultiplier / 10;
+		maxYvalue = max;
+		min = Math.floor(min / reverseMultiplier * 10) * reverseMultiplier / 10;
+		minYvalue = min;
+
+		///////////////////////////////////////////////////////
+		//Improve Edges X//////////////////////////////////////
+
+
+		var xDifference = rightX - leftX;
+		var reverseMultiplier = 1;
+
+		if (xDifference < 0) xDifference *= -1;
+		if (!xDifference) return;
+
+		while (xDifference < 1) {
+			xDifference *= 10;
+			reverseMultiplier /= 10;
+		}
+		while (xDifference >= 10) {
+			xDifference /= 10;
+			reverseMultiplier *= 10;
+		}
+		rightX = Math.ceil(rightX / reverseMultiplier * 10) * reverseMultiplier / 10;
+		rightXvalue = rightX;
+		leftX = Math.floor(leftX / reverseMultiplier * 10) * reverseMultiplier / 10;
+		leftXvalue = leftX;
+
+		///////////////////////////////////////////////////////
+	}
 	var graphic_canvas = document.getElementById("glassForGraphic");
 	var graphic_context = graphic_canvas.getContext("2d");
 
@@ -780,7 +763,6 @@ var firstScopeCanvasX, firstScopeCanvasY,
 	canvasGraphX, canvasGraphY;
 
 window.onload = function() {
-
 	canvasGraph = document.getElementById("glassForGraphic");
 	contextLiveGraph = canvasGraph.getContext("2d"); 
     canvasScope = document.getElementById("summaryGlassForGraphic");    
@@ -835,7 +817,6 @@ window.onload = function() {
 	    y: touchEvent.touches[0].clientY - rect.top
 	  };
 	}
-	addButtons();
 
 	/*// Get a regular interval for drawing to the screen
 	window.requestAnimFrame = (function (callback) {
@@ -904,23 +885,17 @@ function startInfoDrawing(e) {
 	isInfoDrawing = true;
 	drawInfo(e);
 }
-
-function drawScope(e, scopeRedrawTopBottom, justCalculateTopBottom) {
+function drawScope(e) {
 	if (isScopeDrawing == true) {
-		isMagnified = true;
 		// Определяем текущие координаты указателя мыши
-		var x;
-		if (justRedraw)
-			x = savedBottomGraphMouseXstart;
-		else
-			x = e.pageX - canvasScope.offsetLeft;
-		savedBottomGraphMouseXstart = x;
+		var x = e.pageX - canvasScope.offsetLeft;
 		/*if (x<0+canvasScope.width/200 || x>canvasScope.width*199/200)
 			return;*/
 		if (x < 0+canvasScope.width/200)
 			x = 0+canvasScope.width/200;
 		if (x > canvasScope.width*199/200)
 			x = canvasScope.width*199/200;
+		var y = e.pageY - canvasScope.offsetTop;
 		contextLiveScope.fillStyle = "grey";
 
 		contextLiveScope.fillRect(0,0, canvasScope.width, canvasScope.height);
@@ -938,12 +913,7 @@ function drawScope(e, scopeRedrawTopBottom, justCalculateTopBottom) {
 				0+canvasScope.height/20,
 				(frameOffset[0] + frameOffset[1]),
 				canvasScope.height-canvasScope.height/10 );
-			if (justRedraw)
-				secondScopeCanvasX = savedBottomGraphMouseXend;
-			else
-				secondScopeCanvasX = e.pageX - canvasScope.offsetLeft;
-			savedBottomGraphMouseXend = secondScopeCanvasX;
-			
+
 			firstScopeCanvasX = x - frameOffset[0];
 			secondScopeCanvasX = x + frameOffset[1];
 			if (secondScopeCanvasX < 0+canvasScope.width/200)
@@ -962,11 +932,7 @@ function drawScope(e, scopeRedrawTopBottom, justCalculateTopBottom) {
 				(x-firstScopeCanvasX),
 				canvasScope.height-canvasScope.height/10 );
 
-			if (justRedraw)
-				secondScopeCanvasX = savedBottomGraphMouseXend;
-			else
-				secondScopeCanvasX = e.pageX - canvasScope.offsetLeft;
-			savedBottomGraphMouseXend = secondScopeCanvasX;
+			secondScopeCanvasX = e.pageX - canvasScope.offsetLeft;
 			if (secondScopeCanvasX < 0+canvasScope.width/200)
 				secondScopeCanvasX = 0+canvasScope.width/200;
 			if (secondScopeCanvasX > canvasScope.width*199/200)
@@ -980,9 +946,6 @@ function drawScope(e, scopeRedrawTopBottom, justCalculateTopBottom) {
 
 		let maxYvalueArr = [];
 		let minYvalueArr = [];
-		if (justCalculateTopBottom){
-			ordinatArrays = allGraphsInGroup.columns.slice(1).map(x=>x.slice(1));
-		}
 		for (let i = 0; i < ordinatArrays.length; i++){
 			maxYvalueArr.push(
 				getMaximumValue(leftXvalue, rightXvalue, "nothing", ordinatArrays[i])
@@ -997,16 +960,9 @@ function drawScope(e, scopeRedrawTopBottom, justCalculateTopBottom) {
 		let yGap = maxYvalue - minYvalue;
 		maxYvalue += yGap *0.01;
 		minYvalue -= yGap *0.01;
+
 		
-		saveScopeTopBottom = [maxYvalue, minYvalue];
-
-		if(justCalculateTopBottom){
-			return [maxYvalue, minYvalue];
-		}
-
-		if (scopeRedrawTopBottom){
-			[maxYvalue, minYvalue] = scopeRedrawTopBottom;
-		}
+		//console.log("maxYvalue: " + maxYvalue);
 
 		showRectangle(
 			maxYvalue,
@@ -1041,10 +997,6 @@ function drawInfo(e) {
 		contextLiveGraph.fillStyle = "#999";
 		//debugger;
 		//leftXvalue, rightXvalue, minYvalue, maxYvalue;
-		if (leftXvalue === undefined){
-			leftXvalue = allLeftX;
-			rightXvalue = allRightX;
-		}
 		let xValue = leftXvalue + x / canvasGraph.width * (rightXvalue - leftXvalue);
 		let xIndex = getClosestXsIndexes(xValue);
 		console.log("xIndex: " + xIndex);
@@ -1058,15 +1010,13 @@ function drawInfo(e) {
 		contextLiveGraph.fillStyle = "#000";*/
 
 		let leftXIndent, rightXIndent, topIndet, boxHeight;
-		leftXIndent = 80;
-		rightXIndent = 80;
+		leftXIndent = 60;
+		rightXIndent = 60;
 		topIndet = 20;
 		boxHeight = 80;
-		if (allGraphsInGroup.columns.slice(1).length > 2)
-			boxHeight *=1.5;
 
 		contextLiveGraph.clearRect(0,0, canvasGraph.width, canvasGraph.height);
-		//debugger;
+
 		let maxCurrentYarr = [];
 		for (let i = 0; i < ordinatArrays.length; i++){
 			maxCurrentYarr.push(+arrForInfoY[xIndex][i]);
@@ -1077,18 +1027,10 @@ function drawInfo(e) {
 
 
 		contextLiveGraph.fillRect(xValue-1, maxCurrentY, 2, canvasGraph.height);
-		let rightIndexes = [];
-		for (let i = 0; i < checksArr.length; i++) {
-			if (checksArr[i])
-				rightIndexes.push(i);
-		}
+
 
 		//contextLiveGraph.fillStyle = "#000";
-		for (let i = 0; i < ordinatArrays.length; i++){
-			drawInfoCircle(xIndex, xValue, i, allGraphsInGroup.colors[`y${rightIndexes[i]}`]);
-		}
-
-		/*contextLiveGraph.beginPath();
+		contextLiveGraph.beginPath();
 		contextLiveGraph.arc(xValue, arrForInfoY[xIndex][0], 4, 0, 2 * Math.PI);
 		contextLiveGraph.stroke();
 		contextLiveGraph.fillStyle = 'white';
@@ -1104,7 +1046,7 @@ function drawInfo(e) {
 		contextLiveGraph.fill();
 		contextLiveGraph.lineWidth = 2;
 		contextLiveGraph.strokeStyle = '#f00';
-		contextLiveGraph.stroke();*/
+		contextLiveGraph.stroke();
 		
 		contextLiveGraph.strokeStyle = 'grey';
 
@@ -1191,29 +1133,10 @@ function drawInfo(e) {
 		console.log("one drow " + (oneDrowEnd-oneDrowStart) );*/
 	}
 }
-function drawInfoCircle(xIndex, xValue, graphIndex, color){
-	contextLiveGraph.beginPath();
-	contextLiveGraph.arc(xValue, arrForInfoY[xIndex][graphIndex], 4, 0, 2 * Math.PI);
-	contextLiveGraph.stroke();
-	let fillColor = document.documentElement.style.backgroundColor;
-	fillColor = fillColor ? fillColor : "#fff"; 
-	contextLiveGraph.fillStyle = fillColor;
-	contextLiveGraph.fill();
-	contextLiveGraph.lineWidth = 2;
-	contextLiveGraph.strokeStyle = color;
-	contextLiveGraph.stroke();
-}
 function drawInfoOnGraph(e) {
 }
-function drawBox(context, color,
-			boxLeftX, boxRightX, boxMiddleX,
-			boxTopY, boxBottomY, boxMiddleY,
-			currentX, xIndex) {
-	//color
-	let fillColor = document.documentElement.style.backgroundColor;
-	fillColor = fillColor ? fillColor : "#fff"; 
-	context.fillStyle = fillColor;
-
+function drawBox(context, color, boxLeftX, boxRightX, boxMiddleX, boxTopY, boxBottomY, boxMiddleY, currentX, xIndex) {
+	context.fillStyle = color;
 	context.beginPath();
     context.moveTo(boxLeftX, boxMiddleY);
     //        A
@@ -1228,12 +1151,12 @@ function drawBox(context, color,
 	context.stroke();
 	context.fill();
 
-	context.fillStyle = "grey";
+	context.fillStyle = "#000";
 	//context.strokeStyle = "#F00";
 	context.font = "bold 18px Georgia sans-serif";
 	//debugger;
 	let dataText = new Date(+arrayX[xIndex]).toLocaleString("en-US", {weekday: "short", month: "short", day: "numeric"});
-	context.fillText(dataText, boxLeftX + 40, boxTopY + 20, 80);
+	context.fillText(dataText, boxLeftX + 20, boxTopY + 20, 80);
 	//context.font = 'bold 30px sans-serif';
 	//context.strokeText("Stroke text", 20, 100);
 
@@ -1241,55 +1164,16 @@ function drawBox(context, color,
 	//context.strokeStyle = "#F00";
 	context.font = "bold 20px Georgia sans-serif";
 	//debugger;
-	let leftColIndent = 10;
-	let rightColIndent = (boxRightX - boxLeftX)/2 + leftColIndent;
+	dataText = ordinatArrays[0][xIndex];
+	context.fillText(dataText, boxLeftX + 10, boxTopY + 40, 50);
+	dataText = data[radioSelect()].names.y0;
+	context.fillText(dataText, boxLeftX + 10, boxTopY + 60, 50);
 
-	let rightIndexes = [];
-	for (let i = 0; i < checksArr.length; i++) {
-		if (checksArr[i])
-			rightIndexes.push(i);
-	}
-	for (let iterator = 0; iterator < ordinatArrays.length; iterator++) {
-		currentColor = allGraphsInGroup.colors[`y${rightIndexes[iterator]}`];		
-		drawAllData(rightIndexes[iterator], context, xIndex, boxLeftX, leftColIndent, rightColIndent,
-		 boxTopY, boxRightX, currentColor, iterator, ordinatArrays.length);
-	}
-
-}
-function drawAllData(rigthIndex, context, xIndex, boxLeftX, leftColIndent, rightColIndent,
-	boxTopY, boxRightX, currentColor, iterator, onlyOne){	
-	//allGraphsInGroup.colors[`y${i}`]
-	let wordLen;
-	if (!(iterator%2)){
-		colIndent = leftColIndent;
-	} else {
-		colIndent = rightColIndent;
-	}
-	let line = 2 ;
-	if (iterator > 1){
-		line++;
-		line++;
-	}
-	//allGraphsInGroup.names[`y${rigthIndex}`].length
-	if (onlyOne == 1){
-		wordLen =
-			(""+ordinatArrays[iterator][xIndex]).length
-		 * 8;
-		colIndent = ((boxRightX - boxLeftX) - wordLen)/2;
-	}
-
-	context.fillStyle = currentColor;
-	dataText = ordinatArrays[iterator][xIndex];
-	context.fillText(dataText, boxLeftX + colIndent, boxTopY + line * 20, (boxRightX - boxLeftX)/2 - leftColIndent*2);
-	line++;
-	if (onlyOne == 1){
-		wordLen =
-			allGraphsInGroup.names[`y${rigthIndex}`].length
-		 * 8;
-		colIndent = ((boxRightX - boxLeftX) - wordLen)/2;
-	}
-	dataText = allGraphsInGroup.names[`y${rigthIndex}`];
-	context.fillText(dataText, boxLeftX + colIndent, boxTopY + line * 20, (boxRightX - boxLeftX)/2 - leftColIndent*2);
+	context.fillStyle = "#0F0";
+	dataText = ordinatArrays[1][xIndex];
+	context.fillText(dataText, boxLeftX + 70, boxTopY + 40, 50);
+	dataText = data[radioSelect()].names.y1;
+	context.fillText(dataText, boxLeftX + 70, boxTopY + 60, 50);
 }
 function stopScopeDrawing(e) {
 	isScopeDrawing = false;
@@ -1365,9 +1249,9 @@ function addButtons() {
 	let div = document.createElement("div");
 	div.id = "buttons";
 	document.getElementById("container").insertBefore(div, document.getElementById("colorMode").parentElement);
-	for (let key in allGraphsInGroup.colors) {
-		buttonAdd(allGraphsInGroup.names[key], count);
-		styleAdd(allGraphsInGroup.colors[key], count);
+	for (let key in data[radioSelect()].colors) {
+		buttonAdd(data[radioSelect()].names[key], count);
+		styleAdd(data[radioSelect()].colors[key], count);
 		count++;
 	}
 }
@@ -1398,8 +1282,6 @@ function buttonAdd(text, option) {
 	input.name = `option${option}`;
 	input.type = "checkbox";
 	input.checked = true;
-	//input.onclick = changeGraphsInGroup;
-	input.setAttribute("onclick", "changeGraphsInGroup()");
 	let label = document.createElement("label");
 	label.innerText = text;
 	label.setAttribute("for", `option${option}`);
@@ -1411,157 +1293,4 @@ function styleAdd(color, option) {
 	let style = document.createElement("style");
 	style.innerText = `.inputGroup input:checked ~ label[for=option${option}]:after {\nbackground-color: ${color};\nborder-color: ${color};\n}`;
 	document.getElementById("buttons").appendChild(style);
-}
-function changeGraphsInGroup(isItSecondCall){
-	//debugger;
-	if (!isItSecondCall){
-		oldAllGraphsInGroup = Object.assign({}, allGraphsInGroup);
-		oldChecksArr = checksArr;
-	} else {
-		//debugger;
-		//oldAllGraphsInGroup = {};
-		//oldChecksArr = [];
-	}
-	checksArr = [];
-	let nodes = document.querySelectorAll(".inputGroup");
-	if (nodes.length == 0){
-		allGraphsInGroup = data[radioSelect()];
-		checksArr = [true, true, true, true];
-		return;
-	}
-	for (let i = 0; i < nodes.length; i++ ) {
-		checksArr.push(nodes[i].firstChild.checked);		
-	}
-	//oldAllGraphsInGroup, oldChecksArr;	
-
-	allGraphsInGroup = {};
-
-	//debugger;
-	reallyAllGraphsInGroup = data[radioSelect()];
-	for (let prop in reallyAllGraphsInGroup){
-		if ( !Array.isArray(reallyAllGraphsInGroup[prop]) ){
-			let i = 0;
-			allGraphsInGroup[prop] = {};
-			for (let innerProp in reallyAllGraphsInGroup[prop]){
-				if (checksArr[i] || innerProp == "x"){
-					allGraphsInGroup[prop][innerProp] = (reallyAllGraphsInGroup[prop][innerProp]);
-				}				
-				i++;
-			}
-		}
-		else{
-			allGraphsInGroup[prop] = [];
-			for (let i = 0; i < reallyAllGraphsInGroup[prop].length; i++){
-				if (i==0 || checksArr[i-1]){
-					allGraphsInGroup[prop].push(reallyAllGraphsInGroup[prop][i]);
-				}
-			}	
-		}			
-	}
-	if(!isItSecondCall){
-		debugger;
-		let diviser = 5;		
-		let oldTopFirst = maxYvalue;
-		let oldBotFirst = minYvalue;
-		let wasMagn = isMagnified;
-		let newTopBottomFirst;
-		let newTopBottomSecond;
-		let topSecond, botSecond;
-		let oldTopSecond, oldBotSecond;
-		let topDiffSecond;
-		let botDiffSecond
-		if (!isMagnified){
-			newTopBottomFirst = buildGraphic(false, true);
-		}
-		else{
-			newTopBottomFirst = buildGraphic(false, true);
-			[oldTopSecond, oldBotSecond] = saveScopeTopBottom;
-			justRedraw = true;
-			isScopeDrawing = true;
-			newTopBottomSecond = drawScope(false, false, true);
-			justRedraw = false;
-			isScopeDrawing = false;
-
-			[topSecond, botSecond] = newTopBottomSecond;
-			topDiffSecond = (topSecond - oldTopSecond)/ diviser;
-			botDiffSecond = (botSecond - oldBotSecond)/ diviser;
-		}
-		isMagnified = wasMagn;
-		if (!oldAllGraphsInGroup)
-			return;
-		allGraphsInGroup = oldAllGraphsInGroup;
-		checksArr = oldChecksArr;
-
-		
-		let [topFirst, botFirst] = newTopBottomFirst;
-		/*maxYvalue += yGap *0.01;
-		minYvalue -= yGap *0.01;*/
-		if(topFirst == oldTopFirst && botFirst == oldBotFirst
-		&& topSecond == oldTopSecond && botSecond == oldBotSecond ){
-			changeGraphsInGroup(true);
-			debugger;
-			return;
-		}
-
-		let topDiffFirst = (topFirst - oldTopFirst)/ diviser;
-		//let topDiffSecond = (topSecond - oldTopSecond)/ diviser;
-		let botDiffFirst = (botFirst - oldBotFirst)/ diviser;
-		//let botDiffSecond = (botSecond - oldBotSecond)/ diviser;
-
-		if(isMagnified){
-			for (let i = 1; i <= diviser; i++){
-				setTimeout(buildGraphic, 50*i, ...[1, 0, oldTopFirst+topDiffFirst*i, oldBotFirst+botDiffFirst*i]);
-			}
-			justRedraw = true;
-			isScopeDrawing = true;
-
-			for (let i = 1; i <= diviser; i++){
-				//debugger;
-				setTimeout(drawScope, 50*i, "nothing", [oldTopSecond+topDiffSecond*i, oldBotSecond+botDiffSecond*i]);
-			}
-			//debugger;
-			setTimeout(()=>{justRedraw = false; isScopeDrawing = false;}, 50 * (diviser+1));
-			//drawScope();		
-			//justRedraw = false;		
-			//isScopeDrawing = false;
-			//isMagnified = true;
-		}
-		else{
-			for (let i = 1; i <= diviser; i++){
-				setTimeout(buildGraphic, 50*i, ...[0, 0, oldTopFirst+topDiffFirst*i, oldBotFirst+botDiffFirst*i]);
-			}
-		}
-
-
-		setTimeout(changeGraphsInGroup, 50 * (diviser+1), true);
-		//changeGraphsInGroup(true);
-		return;
-	}
-	if(isMagnified){		
-		buildGraphic(true);
-		justRedraw = true;
-		isScopeDrawing = true;
-		//debugger;
-		drawScope();		
-		justRedraw = false;		
-		isScopeDrawing = false;
-	} else {
-		buildGraphic();
-	}
-	//changeGraphsInGroup(true);
-	//drawScope();
-	//allGraphsInGroup =
-}
-function topButtonClick(isItSecondCall){
-	//debugger;
-	isMagnified = false;
-	allGraphsInGroup = data[radioSelect()];
-	//changeGraphsInGroup();
-
-	addButtons();
-	changeGraphsInGroup(isItSecondCall);
-	//buildGraphic();
-
-	document.getElementById("summaryGlassForGraphic").width = 
-	document.getElementById("summaryGlassForGraphic").width;// redraw canvas 
 }
