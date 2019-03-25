@@ -181,7 +181,7 @@ function drawLines(graphic_context, graphic_height, graphic_width, leftX, horizo
 
 	let oldDataText = "";
 	for (var x = 0; x <= xMax+1; x++) {
-		xSpecialRound = ( x * xBlackStep - oddXPiece );//strange but more precision = better result
+		xSpecialRound = ( x * xBlackStep - oddXPiece );
 
 		let dataText = new Date(+(+xSpecialRound + leftX).toFixed( 0 )).toLocaleString("en-US", {month: "short", day: "numeric"});
 		if (dataText == oldDataText){
@@ -808,7 +808,6 @@ function buttonAdd(text, option) {
 	input.name = `option${option}`;
 	input.type = "checkbox";
 	input.checked = true;
-	//input.onclick = changeGraphsInGroup;
 	input.setAttribute("onclick", "changeGraphsInGroup()");
 	let label = document.createElement("label");
 	label.innerText = text;
