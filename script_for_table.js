@@ -835,6 +835,7 @@ window.onload = function() {
 	    y: touchEvent.touches[0].clientY - rect.top
 	  };
 	}
+	addButtons();
 
 	/*// Get a regular interval for drawing to the screen
 	window.requestAnimFrame = (function (callback) {
@@ -905,11 +906,8 @@ function startInfoDrawing(e) {
 }
 
 function drawScope(e, scopeRedrawTopBottom, justCalculateTopBottom) {
-	//debugger;
-	if (isScopeDrawing == true)
-	{
+	if (isScopeDrawing == true) {
 		isMagnified = true;
-		let oneDrowStart = performance.now();
 		// Определяем текущие координаты указателя мыши
 		var x;
 		if (justRedraw)
@@ -923,7 +921,6 @@ function drawScope(e, scopeRedrawTopBottom, justCalculateTopBottom) {
 			x = 0+canvasScope.width/200;
 		if (x > canvasScope.width*199/200)
 			x = canvasScope.width*199/200;
-		//var y = e.pageY - canvasScope.offsetTop;
 		contextLiveScope.fillStyle = "grey";
 
 		contextLiveScope.fillRect(0,0, canvasScope.width, canvasScope.height);
@@ -941,7 +938,12 @@ function drawScope(e, scopeRedrawTopBottom, justCalculateTopBottom) {
 				0+canvasScope.height/20,
 				(frameOffset[0] + frameOffset[1]),
 				canvasScope.height-canvasScope.height/10 );
-
+			if (justRedraw)
+				secondScopeCanvasX = savedBottomGraphMouseXend;
+			else
+				secondScopeCanvasX = e.pageX - canvasScope.offsetLeft;
+			savedBottomGraphMouseXend = secondScopeCanvasX;
+			
 			firstScopeCanvasX = x - frameOffset[0];
 			secondScopeCanvasX = x + frameOffset[1];
 			if (secondScopeCanvasX < 0+canvasScope.width/200)
@@ -960,13 +962,16 @@ function drawScope(e, scopeRedrawTopBottom, justCalculateTopBottom) {
 				(x-firstScopeCanvasX),
 				canvasScope.height-canvasScope.height/10 );
 
-			secondScopeCanvasX = e.pageX - canvasScope.offsetLeft;
+			if (justRedraw)
+				secondScopeCanvasX = savedBottomGraphMouseXend;
+			else
+				secondScopeCanvasX = e.pageX - canvasScope.offsetLeft;
+			savedBottomGraphMouseXend = secondScopeCanvasX;
 			if (secondScopeCanvasX < 0+canvasScope.width/200)
 				secondScopeCanvasX = 0+canvasScope.width/200;
 			if (secondScopeCanvasX > canvasScope.width*199/200)
 				secondScopeCanvasX = canvasScope.width*199/200;
 		}
-
 		
 		leftXvalue = allLeftX + ( firstScopeCanvasX < secondScopeCanvasX ? firstScopeCanvasX : secondScopeCanvasX ) / canvasScope.width * (allRightX - allLeftX);
 		rightXvalue = allLeftX + ( firstScopeCanvasX > secondScopeCanvasX ? firstScopeCanvasX : secondScopeCanvasX ) / canvasScope.width * (allRightX - allLeftX);
@@ -992,20 +997,16 @@ function drawScope(e, scopeRedrawTopBottom, justCalculateTopBottom) {
 		let yGap = maxYvalue - minYvalue;
 		maxYvalue += yGap *0.01;
 		minYvalue -= yGap *0.01;
-
+		
 		saveScopeTopBottom = [maxYvalue, minYvalue];
 
 		if(justCalculateTopBottom){
 			return [maxYvalue, minYvalue];
 		}
 
-		//if (justRedraw){
 		if (scopeRedrawTopBottom){
 			[maxYvalue, minYvalue] = scopeRedrawTopBottom;
 		}
-
-		
-		//console.log("maxYvalue: " + maxYvalue);
 
 		showRectangle(
 			maxYvalue,
@@ -1057,10 +1058,12 @@ function drawInfo(e) {
 		contextLiveGraph.fillStyle = "#000";*/
 
 		let leftXIndent, rightXIndent, topIndet, boxHeight;
-		leftXIndent = 60;
-		rightXIndent = 60;
+		leftXIndent = 80;
+		rightXIndent = 80;
 		topIndet = 20;
 		boxHeight = 80;
+		if (allGraphsInGroup.columns.slice(1).length > 2)
+			boxHeight *=1.5;
 
 		contextLiveGraph.clearRect(0,0, canvasGraph.width, canvasGraph.height);
 		//debugger;
@@ -1074,11 +1077,15 @@ function drawInfo(e) {
 
 
 		contextLiveGraph.fillRect(xValue-1, maxCurrentY, 2, canvasGraph.height);
-
+		let rightIndexes = [];
+		for (let i = 0; i < checksArr.length; i++) {
+			if (checksArr[i])
+				rightIndexes.push(i);
+		}
 
 		//contextLiveGraph.fillStyle = "#000";
 		for (let i = 0; i < ordinatArrays.length; i++){
-			drawInfoCircle(xIndex, xValue, i, allGraphsInGroup.colors[`y${i}`]);
+			drawInfoCircle(xIndex, xValue, i, allGraphsInGroup.colors[`y${rightIndexes[i]}`]);
 		}
 
 		/*contextLiveGraph.beginPath();
@@ -1221,12 +1228,12 @@ function drawBox(context, color,
 	context.stroke();
 	context.fill();
 
-	context.fillStyle = "#000";
+	context.fillStyle = "grey";
 	//context.strokeStyle = "#F00";
 	context.font = "bold 18px Georgia sans-serif";
 	//debugger;
 	let dataText = new Date(+arrayX[xIndex]).toLocaleString("en-US", {weekday: "short", month: "short", day: "numeric"});
-	context.fillText(dataText, boxLeftX + 20, boxTopY + 20, 80);
+	context.fillText(dataText, boxLeftX + 40, boxTopY + 20, 80);
 	//context.font = 'bold 30px sans-serif';
 	//context.strokeText("Stroke text", 20, 100);
 
@@ -1234,16 +1241,55 @@ function drawBox(context, color,
 	//context.strokeStyle = "#F00";
 	context.font = "bold 20px Georgia sans-serif";
 	//debugger;
-	dataText = ordinatArrays[0][xIndex];
-	context.fillText(dataText, boxLeftX + 10, boxTopY + 40, 50);
-	dataText = allGraphsInGroup.names.y0;
-	context.fillText(dataText, boxLeftX + 10, boxTopY + 60, 50);
+	let leftColIndent = 10;
+	let rightColIndent = (boxRightX - boxLeftX)/2 + leftColIndent;
 
-	context.fillStyle = "#0F0";
-	dataText = ordinatArrays[1][xIndex];
-	context.fillText(dataText, boxLeftX + 70, boxTopY + 40, 50);
-	dataText = allGraphsInGroup.names.y1;
-	context.fillText(dataText, boxLeftX + 70, boxTopY + 60, 50);
+	let rightIndexes = [];
+	for (let i = 0; i < checksArr.length; i++) {
+		if (checksArr[i])
+			rightIndexes.push(i);
+	}
+	for (let iterator = 0; iterator < ordinatArrays.length; iterator++) {
+		currentColor = allGraphsInGroup.colors[`y${rightIndexes[iterator]}`];		
+		drawAllData(rightIndexes[iterator], context, xIndex, boxLeftX, leftColIndent, rightColIndent,
+		 boxTopY, boxRightX, currentColor, iterator, ordinatArrays.length);
+	}
+
+}
+function drawAllData(rigthIndex, context, xIndex, boxLeftX, leftColIndent, rightColIndent,
+	boxTopY, boxRightX, currentColor, iterator, onlyOne){	
+	//allGraphsInGroup.colors[`y${i}`]
+	let wordLen;
+	if (!(iterator%2)){
+		colIndent = leftColIndent;
+	} else {
+		colIndent = rightColIndent;
+	}
+	let line = 2 ;
+	if (iterator > 1){
+		line++;
+		line++;
+	}
+	//allGraphsInGroup.names[`y${rigthIndex}`].length
+	if (onlyOne == 1){
+		wordLen =
+			(""+ordinatArrays[iterator][xIndex]).length
+		 * 8;
+		colIndent = ((boxRightX - boxLeftX) - wordLen)/2;
+	}
+
+	context.fillStyle = currentColor;
+	dataText = ordinatArrays[iterator][xIndex];
+	context.fillText(dataText, boxLeftX + colIndent, boxTopY + line * 20, (boxRightX - boxLeftX)/2 - leftColIndent*2);
+	line++;
+	if (onlyOne == 1){
+		wordLen =
+			allGraphsInGroup.names[`y${rigthIndex}`].length
+		 * 8;
+		colIndent = ((boxRightX - boxLeftX) - wordLen)/2;
+	}
+	dataText = allGraphsInGroup.names[`y${rigthIndex}`];
+	context.fillText(dataText, boxLeftX + colIndent, boxTopY + line * 20, (boxRightX - boxLeftX)/2 - leftColIndent*2);
 }
 function stopScopeDrawing(e) {
 	isScopeDrawing = false;
