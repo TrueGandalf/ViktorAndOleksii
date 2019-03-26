@@ -162,15 +162,6 @@ function drawLines(graphic_context, graphic_height, graphic_width, leftX, horizo
 		graphic_context.beginPath();
 	}
 
-	if (0) {
-		ctx.fillStyle = "#00F";
-		ctx.strokeStyle = "#F00";
-		ctx.font = "italic 30pt Arial";
-		ctx.fillText("Fill text", 20, 50);
-		ctx.font = 'bold 30px sans-serif';
-		ctx.strokeText("Stroke text", 20, 100);
-	}
-
 	graphic_context.font = 'bold 15px Arial';
 	var textXIndent = -20;
 	var textIndent = 3;
@@ -184,7 +175,7 @@ function drawLines(graphic_context, graphic_height, graphic_width, leftX, horizo
 	for (var x = 0; x <= xMax+1; x++) {
 		xSpecialRound = ( x * xBlackStep - oddXPiece );
 
-		let dataText = new Date(+(+xSpecialRound + leftX).toFixed( 0 )).toLocaleString("en-US", {month: "short", day: "numeric"});
+		let dataText = Date(+(+xSpecialRound + leftX).toFixed( 0 )).toLocaleString("en-US", {month: "short", day: "numeric"});
 		if (dataText == oldDataText){
 			dataText = "";
 		} else {
@@ -226,11 +217,11 @@ function drawGraphic(graphic_context, graphic_height, graphic_width, leftX, hori
 		if (newElement !== element) {
 			graphic_context.lineTo(( ( x * horizontalDiapason / (rightX - leftX) ) + ( (arrayX[0] - leftX) / (rightX - leftX) * graphic_width ) ), graphic_height - ( ( ( currentArrayY[Math.floor(x / (graphic_width - 1) * (currentArrayY.length - 1))] - bottomY) / (  verticalDiapason ) * graphic_height) + 1));
 			element = newElement;
-			arrForInfo[newElement] = ( ( x * horizontalDiapason / (rightX - leftX) ) + ( (arrayX[0] - leftX) / (rightX - leftX) * graphic_width ) );
-			arrForInfoY[newElement]? 0 : arrForInfoY[newElement] = [];
-			arrForInfoY[newElement].push(
+			//arrForInfo[newElement] = ( ( x * horizontalDiapason / (rightX - leftX) ) + ( (arrayX[0] - leftX) / (rightX - leftX) * graphic_width ) );
+			//arrForInfoY[newElement]? 0 : arrForInfoY[newElement] = [];
+			/*arrForInfoY[newElement].push(
 				graphic_height - ( ( ( currentArrayY[Math.floor(x / (graphic_width - 1) * (currentArrayY.length - 1))] - bottomY) / (  verticalDiapason ) * graphic_height) + 1)
-			);
+			);*/
 		}
 	}
 
