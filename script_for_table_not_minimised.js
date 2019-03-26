@@ -24,8 +24,6 @@ function radioSelect() {
 function buildGraphic(drawOnlyBottom, justCalculateTopBottom, predifinedTop, predifinedBottom) {
 	if (!drawOnlyBottom)
 		isMagnified = false;
-
-	let timeStart = performance.now();
 	arrayX.length = 0;
 	arrayY.length = 0;
 	if (allGraphsInGroup.columns == undefined) changeGraphsInGroup();
@@ -415,9 +413,25 @@ window.onload = function() {
 	canvasGraph.onmousemove = drawInfo;
 
 	setFullScreen();
+	addTouchestoCavas(canvasScope);
+	addTouchestoCavas(canvasGraph);
 
+
+	function getTouchPos(canvasDom, touchEvent) {
+	  var rect = canvasDom.getBoundingClientRect();
+	  return {
+	    x: touchEvent.touches[0].clientX - rect.left,
+	    y: touchEvent.touches[0].clientY - rect.top
+	  };
+	}
+	
+	addButtons();	
+	document.getElementById("colorMode").addEventListener("click", colorMode, false);
+	setFullScreen();
+
+	function addTouchestoCavas(canvasScope){
 	canvasScope.addEventListener("touchstart", function (e) {
-	        mousePos = getTouchPos(canvasScope, e);
+    	mousePos = getTouchPos(canvasScope, e);
 	  var touch = e.touches[0];
 	  var mouseEvent = new MouseEvent("mousedown", {
 	    clientX: touch.clientX,
@@ -439,18 +453,7 @@ window.onload = function() {
 	  });
 	  canvasScope.dispatchEvent(mouseEvent);
 	}, false);
-
-	function getTouchPos(canvasDom, touchEvent) {
-	  var rect = canvasDom.getBoundingClientRect();
-	  return {
-	    x: touchEvent.touches[0].clientX - rect.left,
-	    y: touchEvent.touches[0].clientY - rect.top
-	  };
 	}
-	
-	addButtons();	
-	document.getElementById("colorMode").addEventListener("click", colorMode, false);
-	setFullScreen();
 };
 
 window.addEventListener('resize', setFullScreen, false);
