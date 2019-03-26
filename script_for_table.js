@@ -13,6 +13,7 @@ var savedBottomGraphMouseXstart, savedBottomGraphMouseXend;
 var justRedraw;
 var oldAllGraphsInGroup, oldChecksArr;
 var saveScopeTopBottom;
+var saveTopBottom;
 
 function radioSelect() {
 	let radios = document.getElementsByName("graph");
@@ -57,6 +58,8 @@ function buildGraphic(drawOnlyBottom, justCalculateTopBottom, predifinedTop, pre
 
 	if (justCalculateTopBottom) {
 		return [maxYvalue, minYvalue];
+	} else {
+		saveTopBottom = [maxYvalue, minYvalue];
 	}
 
 	if (predifinedTop || predifinedBottom) {
@@ -867,9 +870,9 @@ function changeGraphsInGroup(isItSecondCall){
 	if(!isItSecondCall){
 		let frames = 10;
 		let animationTime = 250;
-		let frameTime = animationTime/frames;		
-		let oldTopFirst = maxYvalue;
-		let oldBotFirst = minYvalue;
+		let frameTime = animationTime/frames;
+		let oldTopFirst = saveTopBottom[0];
+		let oldBotFirst = saveTopBottom[1];
 		let wasMagn = isMagnified;
 		let newTopBottomFirst;
 		let newTopBottomSecond;
