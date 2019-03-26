@@ -14,6 +14,7 @@ var justRedraw;
 var oldAllGraphsInGroup, oldChecksArr;
 var saveScopeTopBottom;
 var saveTopBottom;
+var dates = {};
 
 function radioSelect() {
 	let radios = document.getElementsByName("graph");
@@ -174,8 +175,13 @@ function drawLines(graphic_context, graphic_height, graphic_width, leftX, horizo
 	let oldDataText = "";
 	for (var x = 0; x <= xMax+1; x++) {
 		xSpecialRound = ( x * xBlackStep - oddXPiece );
-
-		let dataText = Date(+(+xSpecialRound + leftX).toFixed( 0 )).toLocaleString("en-US", {month: "short", day: "numeric"});
+		let dataText;
+		if (!dates[+(+xSpecialRound + leftX).toFixed( 0 )]){
+			dataText = new Date(+(+xSpecialRound + leftX).toFixed( 0 )).toLocaleString("en-US", {month: "short", day: "numeric"});	
+			dates[+(+xSpecialRound + leftX).toFixed( 0 )] = dataText;
+		} {
+			dataText = dates[+(+xSpecialRound + leftX).toFixed( 0 )];
+		}
 		if (dataText == oldDataText){
 			dataText = "";
 		} else {
@@ -217,11 +223,11 @@ function drawGraphic(graphic_context, graphic_height, graphic_width, leftX, hori
 		if (newElement !== element) {
 			graphic_context.lineTo(( ( x * horizontalDiapason / (rightX - leftX) ) + ( (arrayX[0] - leftX) / (rightX - leftX) * graphic_width ) ), graphic_height - ( ( ( currentArrayY[Math.floor(x / (graphic_width - 1) * (currentArrayY.length - 1))] - bottomY) / (  verticalDiapason ) * graphic_height) + 1));
 			element = newElement;
-			//arrForInfo[newElement] = ( ( x * horizontalDiapason / (rightX - leftX) ) + ( (arrayX[0] - leftX) / (rightX - leftX) * graphic_width ) );
-			//arrForInfoY[newElement]? 0 : arrForInfoY[newElement] = [];
-			/*arrForInfoY[newElement].push(
+			arrForInfo[newElement] = ( ( x * horizontalDiapason / (rightX - leftX) ) + ( (arrayX[0] - leftX) / (rightX - leftX) * graphic_width ) );
+			arrForInfoY[newElement]? 0 : arrForInfoY[newElement] = [];
+			arrForInfoY[newElement].push(
 				graphic_height - ( ( ( currentArrayY[Math.floor(x / (graphic_width - 1) * (currentArrayY.length - 1))] - bottomY) / (  verticalDiapason ) * graphic_height) + 1)
-			);*/
+			);
 		}
 	}
 
